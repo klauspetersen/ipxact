@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created by Kactus2 - Open source IP-Xact toolset -->
+<!-- http://sourceforge.net/projects/kactus2/ -->
+<!-- Date: 03.03.2013 -->
+<!-- Time: 09:44:10 -->
+<spirit:component xmlns:kactus2="http://funbase.cs.tut.fi/" xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.5 http://www.spiritconsortium.org/XMLSchema/SPIRIT/1.5/index.xsd">
+	<spirit:vendor>BifrostLogics</spirit:vendor>
+	<spirit:library>ip</spirit:library>
+	<spirit:name>axi_motor</spirit:name>
+	<spirit:version>v2_00_a</spirit:version>
+	<spirit:memoryMaps>
+		<spirit:memoryMap>
+			<spirit:name>MM0</spirit:name>
+			<spirit:description>Memory map 0</spirit:description>
+			<spirit:addressBlock>
+				<spirit:name>INTR</spirit:name>
+				<spirit:description>Interrupt controller Address Block</spirit:description>
+				<spirit:baseAddress>0x0</spirit:baseAddress>
+				<spirit:range>128</spirit:range>
+				<spirit:width>32</spirit:width>
+				<spirit:usage>register</spirit:usage>
+				<spirit:register>
+					<spirit:name>DGIER</spirit:name>
+					<spirit:description>Global Interrupt Enable Register</spirit:description>
+					<spirit:dim>1</spirit:dim>
+					<spirit:addressOffset>0x1C</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+					<spirit:volatile>false</spirit:volatile>
+					<spirit:access>read-write</spirit:access>
+					<spirit:reset>
+						<spirit:value>0</spirit:value>
+					</spirit:reset>
+					<spirit:field>
+						<spirit:name>GIE</spirit:name>
+						<spirit:description>Global Interrupt Enable</spirit:description>
+						<spirit:bitOffset>31</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:modifiedWriteValue>oneToToggle</spirit:modifiedWriteValue>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>IPISR</spirit:name>
+					<spirit:description>IP Interrupt Status Register</spirit:description>
+					<spirit:dim>1</spirit:dim>
+					<spirit:addressOffset>0x20</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+					<spirit:access>read-write</spirit:access>
+					<spirit:reset>
+						<spirit:value>0</spirit:value>
+					</spirit:reset>
+					<spirit:field>
+						<spirit:name>TRAJ_MOVE_DONE</spirit:name>
+						<spirit:description>Trajectory Generator Movement Done</spirit:description>
+						<spirit:bitOffset>0</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:modifiedWriteValue>oneToToggle</spirit:modifiedWriteValue>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>TRAJ_STOP_DONE</spirit:name>
+						<spirit:description>Trajectory Generator Stop Done</spirit:description>
+						<spirit:bitOffset>2</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:modifiedWriteValue>oneToToggle</spirit:modifiedWriteValue>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>TRAJ_BRAKE_DONE</spirit:name>
+						<spirit:description>Trajectory Generator Brake Done</spirit:description>
+						<spirit:bitOffset>1</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:modifiedWriteValue>oneToToggle</spirit:modifiedWriteValue>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>TRAJ_ERR</spirit:name>
+						<spirit:description>Trajectory Generator Unspecified Error</spirit:description>
+						<spirit:bitOffset>3</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:modifiedWriteValue>oneToToggle</spirit:modifiedWriteValue>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>TRAJ_ERR_LIM</spirit:name>
+						<spirit:description>Trajectory Generator Error Limit Reached</spirit:description>
+						<spirit:bitOffset>4</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:modifiedWriteValue>oneToToggle</spirit:modifiedWriteValue>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+				</spirit:register>
+			</spirit:addressBlock>
+			<spirit:addressBlock>
+				<spirit:name>SET</spirit:name>
+				<spirit:description>Setup Address Block</spirit:description>
+				<spirit:baseAddress>0x80</spirit:baseAddress>
+				<spirit:range>128</spirit:range>
+				<spirit:width>32</spirit:width>
+				<spirit:usage>register</spirit:usage>
+				<spirit:register>
+					<spirit:name>DECELERATION</spirit:name>
+					<spirit:dim>0</spirit:dim>
+					<spirit:addressOffset>0x28</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+					<spirit:access>read-write</spirit:access>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>ERR_LIM_LOW</spirit:name>
+					<spirit:dim>0</spirit:dim>
+					<spirit:addressOffset>0x0</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+					<spirit:access>read-write</spirit:access>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>ERR_LIM_HIGH</spirit:name>
+					<spirit:dim>0</spirit:dim>
+					<spirit:addressOffset>0x4</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+					<spirit:access>read-write</spirit:access>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>P_COEF</spirit:name>
+					<spirit:dim>0</spirit:dim>
+					<spirit:addressOffset>0xC</spirit:addressOffset>
+					<spirit:size>16</spirit:size>
+					<spirit:access>read-write</spirit:access>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>I_MAX</spirit:name>
+					<spirit:dim>0</spirit:dim>
+					<spirit:addressOffset>0x8</spirit:addressOffset>
+					<spirit:size>16</spirit:size>
+					<spirit:access>read-write</spirit:access>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>D_COEF</spirit:name>
+					<spirit:dim>0</spirit:dim>
+					<spirit:addressOffset>0x14</spirit:addressOffset>
+					<spirit:size>16</spirit:size>
+					<spirit:access>read-write</spirit:access>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>I_COEF</spirit:name>
+					<spirit:dim>0</spirit:dim>
+					<spirit:addressOffset>0x10</spirit:addressOffset>
+					<spirit:size>16</spirit:size>
+					<spirit:access>read-write</spirit:access>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>COMMAND</spirit:name>
+					<spirit:dim>0</spirit:dim>
+					<spirit:addressOffset>0x18</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+					<spirit:access>read-write</spirit:access>
+					<spirit:field>
+						<spirit:name>BRAKE</spirit:name>
+						<spirit:description>Brake to halt using controlled deceleration.</spirit:description>
+						<spirit:bitOffset>1</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>RUN</spirit:name>
+						<spirit:description>Run trajectory generation.</spirit:description>
+						<spirit:bitOffset>0</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>STOP</spirit:name>
+						<spirit:description>Stop instantly.</spirit:description>
+						<spirit:bitOffset>2</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>JOG_MODE</spirit:name>
+						<spirit:description>Run in joggin mode using set duty cycle value</spirit:description>
+						<spirit:bitOffset>4</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>TRACK_N</spirit:name>
+						<spirit:description>Track position. Active Low.</spirit:description>
+						<spirit:bitOffset>3</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>JOG_DIRECTION</spirit:name>
+						<spirit:description>Direction in jogging mode</spirit:description>
+						<spirit:bitOffset>5</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>LOAD</spirit:name>
+					<spirit:dim>0</spirit:dim>
+					<spirit:addressOffset>0x1C</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+					<spirit:access>read-write</spirit:access>
+					<spirit:field>
+						<spirit:name>DECELERATION</spirit:name>
+						<spirit:bitOffset>3</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>ACCELERATION</spirit:name>
+						<spirit:bitOffset>2</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>TARGET_VELOCITY</spirit:name>
+						<spirit:bitOffset>1</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>TARGET_POSITION</spirit:name>
+						<spirit:bitOffset>0</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>JERK</spirit:name>
+						<spirit:bitOffset>4</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>START_VELOCITY</spirit:name>
+						<spirit:bitOffset>5</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>CURRENT_POSITION</spirit:name>
+						<spirit:bitOffset>6</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>START_POSITION</spirit:name>
+						<spirit:bitOffset>7</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>PID_I_MAX</spirit:name>
+						<spirit:bitOffset>8</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>DUTY_CYCLE</spirit:name>
+						<spirit:bitOffset>15</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>QUAD_POSITION</spirit:name>
+						<spirit:bitOffset>14</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>ERR_LIM_LOW</spirit:name>
+						<spirit:bitOffset>13</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>ERR_LIM_HIGH</spirit:name>
+						<spirit:bitOffset>12</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>PID_D_COEF</spirit:name>
+						<spirit:bitOffset>11</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>PID_I_COEF</spirit:name>
+						<spirit:bitOffset>10</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>PID_P_COEF</spirit:name>
+						<spirit:bitOffset>9</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:access>read-write</spirit:access>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>TARGET_VELOCITY</spirit:name>
+					<spirit:dim>0</spirit:dim>
+					<spirit:addressOffset>0x20</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+					<spirit:access>read-write</spirit:access>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>ACCELERATION</spirit:name>
+					<spirit:dim>0</spirit:dim>
+					<spirit:addressOffset>0x24</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+					<spirit:access>read-write</spirit:access>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>START_VELOCITY</spirit:name>
+					<spirit:dim>0</spirit:dim>
+					<spirit:addressOffset>0x2C</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+					<spirit:access>read-write</spirit:access>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>QUAD_POSITION</spirit:name>
+					<spirit:dim>0</spirit:dim>
+					<spirit:addressOffset>0x40</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+					<spirit:access>read-write</spirit:access>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>CURRENT_POSITION</spirit:name>
+					<spirit:dim>0</spirit:dim>
+					<spirit:addressOffset>0x3C</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+					<spirit:access>read-write</spirit:access>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>JERK</spirit:name>
+					<spirit:dim>0</spirit:dim>
+					<spirit:addressOffset>0x38</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+					<spirit:access>read-write</spirit:access>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>START_POSITION</spirit:name>
+					<spirit:dim>0</spirit:dim>
+					<spirit:addressOffset>0x34</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+					<spirit:access>read-write</spirit:access>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>TARGET_POSITION</spirit:name>
+					<spirit:dim>0</spirit:dim>
+					<spirit:addressOffset>0x30</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+					<spirit:access>read-write</spirit:access>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>DUTY_CYCLE</spirit:name>
+					<spirit:description>Only used in Forced Duty Cycle Mode</spirit:description>
+					<spirit:dim>0</spirit:dim>
+					<spirit:addressOffset>0x44</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+					<spirit:access>read-write</spirit:access>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>SOFT_RESET</spirit:name>
+					<spirit:dim>0</spirit:dim>
+					<spirit:addressOffset>0x48</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+					<spirit:access>read-write</spirit:access>
+				</spirit:register>
+			</spirit:addressBlock>
+			<spirit:addressBlock>
+				<spirit:name>STS</spirit:name>
+				<spirit:description>Status Address Block</spirit:description>
+				<spirit:baseAddress>0x100</spirit:baseAddress>
+				<spirit:range>128</spirit:range>
+				<spirit:width>32</spirit:width>
+				<spirit:usage>register</spirit:usage>
+				<spirit:register>
+					<spirit:name>TRAJ_BUSY</spirit:name>
+					<spirit:dim>1</spirit:dim>
+					<spirit:addressOffset>0x0</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>QUAD_POSITION</spirit:name>
+					<spirit:dim>1</spirit:dim>
+					<spirit:addressOffset>0x38</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>TRAJ_DECELERATION_DISTANCE</spirit:name>
+					<spirit:dim>1</spirit:dim>
+					<spirit:addressOffset>0x14</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>TRAJ_VELOCITY</spirit:name>
+					<spirit:dim>1</spirit:dim>
+					<spirit:addressOffset>0x10</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>TRAJ_DISTANCE_LEFT</spirit:name>
+					<spirit:dim>1</spirit:dim>
+					<spirit:addressOffset>0xC</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>TRAJ_POSITION</spirit:name>
+					<spirit:dim>1</spirit:dim>
+					<spirit:addressOffset>0x8</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>TRAJ_STATUS</spirit:name>
+					<spirit:dim>1</spirit:dim>
+					<spirit:addressOffset>0x4</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+					<spirit:field>
+						<spirit:name>BRAKE_DONE</spirit:name>
+						<spirit:bitOffset>1</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>MOVE_DONE</spirit:name>
+						<spirit:bitOffset>0</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>STOP_DONE</spirit:name>
+						<spirit:bitOffset>2</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>ERR</spirit:name>
+						<spirit:bitOffset>3</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>ERR_LIM</spirit:name>
+						<spirit:bitOffset>4</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+					<spirit:field>
+						<spirit:name>DIRECTION</spirit:name>
+						<spirit:description>0=Positive, 1=Negative</spirit:description>
+						<spirit:bitOffset>5</spirit:bitOffset>
+						<spirit:bitWidth>1</spirit:bitWidth>
+						<spirit:volatile>false</spirit:volatile>
+						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
+					</spirit:field>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>TRAJ_ERR</spirit:name>
+					<spirit:dim>1</spirit:dim>
+					<spirit:addressOffset>0x18</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>TRAJ_PID</spirit:name>
+					<spirit:dim>1</spirit:dim>
+					<spirit:addressOffset>0x1C</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>TRAJ_ERR_SAT</spirit:name>
+					<spirit:dim>1</spirit:dim>
+					<spirit:addressOffset>0x20</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>TRAJ_PID_P</spirit:name>
+					<spirit:dim>1</spirit:dim>
+					<spirit:addressOffset>0x24</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>TRAJ_PID_I</spirit:name>
+					<spirit:dim>1</spirit:dim>
+					<spirit:addressOffset>0x28</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>TRAJ_PID_D</spirit:name>
+					<spirit:dim>1</spirit:dim>
+					<spirit:addressOffset>0x2C</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>TRAJ_SIGN</spirit:name>
+					<spirit:dim>1</spirit:dim>
+					<spirit:addressOffset>0x30</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+				</spirit:register>
+				<spirit:register>
+					<spirit:name>TRAJ_DUTY_CYCLE</spirit:name>
+					<spirit:dim>1</spirit:dim>
+					<spirit:addressOffset>0x34</spirit:addressOffset>
+					<spirit:size>32</spirit:size>
+				</spirit:register>
+			</spirit:addressBlock>
+			<spirit:addressUnitBits>8</spirit:addressUnitBits>
+		</spirit:memoryMap>
+	</spirit:memoryMaps>
+	<spirit:model>
+		<spirit:views>
+			<spirit:view>
+				<spirit:name>rtl</spirit:name>
+				<spirit:envIdentifier>::</spirit:envIdentifier>
+			</spirit:view>
+		</spirit:views>
+	</spirit:model>
+	<spirit:vendorExtensions>
+		<kactus2:extensions>
+			<kactus2:kts_attributes>
+				<kactus2:kts_productHier>IP</kactus2:kts_productHier>
+				<kactus2:kts_implementation>HW</kactus2:kts_implementation>
+				<kactus2:kts_firmness>Template</kactus2:kts_firmness>
+			</kactus2:kts_attributes>
+		</kactus2:extensions>
+	</spirit:vendorExtensions>
+</spirit:component>
