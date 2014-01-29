@@ -19,6 +19,7 @@
 				<spirit:range>128</spirit:range>
 				<spirit:width>32</spirit:width>
 				<spirit:usage>register</spirit:usage>
+				<spirit:access>read-write</spirit:access>
 				<spirit:register>
 					<spirit:name>DGIER</spirit:name>
 					<spirit:description>Global Interrupt Enable Register</spirit:description>
@@ -29,6 +30,7 @@
 					<spirit:access>read-write</spirit:access>
 					<spirit:reset>
 						<spirit:value>0</spirit:value>
+						<spirit:mask>1</spirit:mask>
 					</spirit:reset>
 					<spirit:field>
 						<spirit:name>GIE</spirit:name>
@@ -36,8 +38,9 @@
 						<spirit:bitOffset>31</spirit:bitOffset>
 						<spirit:bitWidth>1</spirit:bitWidth>
 						<spirit:volatile>false</spirit:volatile>
-						<spirit:access>read-write</spirit:access>
+						<spirit:access>read-writeOnce</spirit:access>
 						<spirit:modifiedWriteValue>oneToToggle</spirit:modifiedWriteValue>
+						<spirit:readAction>modify</spirit:readAction>
 						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
 					</spirit:field>
 				</spirit:register>
@@ -59,6 +62,7 @@
 						<spirit:volatile>false</spirit:volatile>
 						<spirit:access>read-write</spirit:access>
 						<spirit:modifiedWriteValue>oneToToggle</spirit:modifiedWriteValue>
+						<spirit:readAction>modify</spirit:readAction>
 						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
 					</spirit:field>
 					<spirit:field>
@@ -69,6 +73,7 @@
 						<spirit:volatile>false</spirit:volatile>
 						<spirit:access>read-write</spirit:access>
 						<spirit:modifiedWriteValue>oneToToggle</spirit:modifiedWriteValue>
+						<spirit:readAction>modify</spirit:readAction>
 						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
 					</spirit:field>
 					<spirit:field>
@@ -79,6 +84,7 @@
 						<spirit:volatile>false</spirit:volatile>
 						<spirit:access>read-write</spirit:access>
 						<spirit:modifiedWriteValue>oneToToggle</spirit:modifiedWriteValue>
+						<spirit:readAction>modify</spirit:readAction>
 						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
 					</spirit:field>
 					<spirit:field>
@@ -89,6 +95,7 @@
 						<spirit:volatile>false</spirit:volatile>
 						<spirit:access>read-write</spirit:access>
 						<spirit:modifiedWriteValue>oneToToggle</spirit:modifiedWriteValue>
+						<spirit:readAction>modify</spirit:readAction>
 						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
 					</spirit:field>
 					<spirit:field>
@@ -99,6 +106,7 @@
 						<spirit:volatile>false</spirit:volatile>
 						<spirit:access>read-write</spirit:access>
 						<spirit:modifiedWriteValue>oneToToggle</spirit:modifiedWriteValue>
+						<spirit:readAction>modify</spirit:readAction>
 						<spirit:testable spirit:testConstraint="unConstrained">true</spirit:testable>
 					</spirit:field>
 				</spirit:register>
@@ -110,6 +118,7 @@
 				<spirit:range>128</spirit:range>
 				<spirit:width>32</spirit:width>
 				<spirit:usage>register</spirit:usage>
+				<spirit:access>read-write</spirit:access>
 				<spirit:register>
 					<spirit:name>DECELERATION</spirit:name>
 					<spirit:dim>0</spirit:dim>
@@ -136,7 +145,7 @@
 					<spirit:dim>0</spirit:dim>
 					<spirit:addressOffset>0xC</spirit:addressOffset>
 					<spirit:size>16</spirit:size>
-					<spirit:access>read-write</spirit:access>
+					<spirit:access>read-only</spirit:access>
 				</spirit:register>
 				<spirit:register>
 					<spirit:name>I_MAX</spirit:name>
@@ -434,47 +443,55 @@
 				<spirit:range>128</spirit:range>
 				<spirit:width>32</spirit:width>
 				<spirit:usage>register</spirit:usage>
+				<spirit:access>read-only</spirit:access>
 				<spirit:register>
 					<spirit:name>TRAJ_BUSY</spirit:name>
 					<spirit:dim>1</spirit:dim>
 					<spirit:addressOffset>0x0</spirit:addressOffset>
 					<spirit:size>32</spirit:size>
+					<spirit:access>read-only</spirit:access>
 				</spirit:register>
 				<spirit:register>
 					<spirit:name>QUAD_POSITION</spirit:name>
 					<spirit:dim>1</spirit:dim>
 					<spirit:addressOffset>0x38</spirit:addressOffset>
 					<spirit:size>32</spirit:size>
+					<spirit:access>read-only</spirit:access>
 				</spirit:register>
 				<spirit:register>
 					<spirit:name>TRAJ_DECELERATION_DISTANCE</spirit:name>
 					<spirit:dim>1</spirit:dim>
 					<spirit:addressOffset>0x14</spirit:addressOffset>
 					<spirit:size>32</spirit:size>
+					<spirit:access>read-only</spirit:access>
 				</spirit:register>
 				<spirit:register>
 					<spirit:name>TRAJ_VELOCITY</spirit:name>
 					<spirit:dim>1</spirit:dim>
 					<spirit:addressOffset>0x10</spirit:addressOffset>
 					<spirit:size>32</spirit:size>
+					<spirit:access>read-only</spirit:access>
 				</spirit:register>
 				<spirit:register>
 					<spirit:name>TRAJ_DISTANCE_LEFT</spirit:name>
 					<spirit:dim>1</spirit:dim>
 					<spirit:addressOffset>0xC</spirit:addressOffset>
 					<spirit:size>32</spirit:size>
+					<spirit:access>read-only</spirit:access>
 				</spirit:register>
 				<spirit:register>
 					<spirit:name>TRAJ_POSITION</spirit:name>
 					<spirit:dim>1</spirit:dim>
 					<spirit:addressOffset>0x8</spirit:addressOffset>
 					<spirit:size>32</spirit:size>
+					<spirit:access>read-only</spirit:access>
 				</spirit:register>
 				<spirit:register>
 					<spirit:name>TRAJ_STATUS</spirit:name>
 					<spirit:dim>1</spirit:dim>
 					<spirit:addressOffset>0x4</spirit:addressOffset>
 					<spirit:size>32</spirit:size>
+					<spirit:access>read-only</spirit:access>
 					<spirit:field>
 						<spirit:name>BRAKE_DONE</spirit:name>
 						<spirit:bitOffset>1</spirit:bitOffset>
@@ -524,48 +541,56 @@
 					<spirit:dim>1</spirit:dim>
 					<spirit:addressOffset>0x18</spirit:addressOffset>
 					<spirit:size>32</spirit:size>
+					<spirit:access>read-only</spirit:access>
 				</spirit:register>
 				<spirit:register>
 					<spirit:name>TRAJ_PID</spirit:name>
 					<spirit:dim>1</spirit:dim>
 					<spirit:addressOffset>0x1C</spirit:addressOffset>
 					<spirit:size>32</spirit:size>
+					<spirit:access>read-only</spirit:access>
 				</spirit:register>
 				<spirit:register>
 					<spirit:name>TRAJ_ERR_SAT</spirit:name>
 					<spirit:dim>1</spirit:dim>
 					<spirit:addressOffset>0x20</spirit:addressOffset>
 					<spirit:size>32</spirit:size>
+					<spirit:access>read-only</spirit:access>
 				</spirit:register>
 				<spirit:register>
 					<spirit:name>TRAJ_PID_P</spirit:name>
 					<spirit:dim>1</spirit:dim>
 					<spirit:addressOffset>0x24</spirit:addressOffset>
 					<spirit:size>32</spirit:size>
+					<spirit:access>read-only</spirit:access>
 				</spirit:register>
 				<spirit:register>
 					<spirit:name>TRAJ_PID_I</spirit:name>
 					<spirit:dim>1</spirit:dim>
 					<spirit:addressOffset>0x28</spirit:addressOffset>
 					<spirit:size>32</spirit:size>
+					<spirit:access>read-only</spirit:access>
 				</spirit:register>
 				<spirit:register>
 					<spirit:name>TRAJ_PID_D</spirit:name>
 					<spirit:dim>1</spirit:dim>
 					<spirit:addressOffset>0x2C</spirit:addressOffset>
 					<spirit:size>32</spirit:size>
+					<spirit:access>read-only</spirit:access>
 				</spirit:register>
 				<spirit:register>
 					<spirit:name>TRAJ_SIGN</spirit:name>
 					<spirit:dim>1</spirit:dim>
 					<spirit:addressOffset>0x30</spirit:addressOffset>
 					<spirit:size>32</spirit:size>
+					<spirit:access>read-only</spirit:access>
 				</spirit:register>
 				<spirit:register>
 					<spirit:name>TRAJ_DUTY_CYCLE</spirit:name>
 					<spirit:dim>1</spirit:dim>
 					<spirit:addressOffset>0x34</spirit:addressOffset>
 					<spirit:size>32</spirit:size>
+					<spirit:access>read-only</spirit:access>
 				</spirit:register>
 			</spirit:addressBlock>
 			<spirit:addressUnitBits>8</spirit:addressUnitBits>
