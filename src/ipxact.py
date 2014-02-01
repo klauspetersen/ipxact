@@ -29,7 +29,6 @@ from lxml import etree
 
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
-from numpy.ma.core import ceil
 
 __all__ = []
 __version__ = 0.1
@@ -205,7 +204,8 @@ def ifNotNoneReturnText(element):
     else:
         return None
  
-def openXMLFileReturnRoot(path):   
+def openXMLFileReturnRoot(path):
+    path = os.path.normpath(path)
     if os.path.exists(os.path.abspath(path)):
         log.info("Opening file: %s", path)
         tree = etree.parse(path)
@@ -743,21 +743,24 @@ USAGE
         parser.add_argument('-regBaseAddressOffsetWidth', help="width of std_logic_vector in generated register address offset output [default: %(default)s]", metavar='width', default=32, type=int)
         parser.add_argument('-regBaseAddressOffsetFormat', help="format of std_logic_vector in generated register address offset mask output [default: %(default)s]", metavar='format', default="hex")
         parser.add_argument('-V', '--version', action='version', version=program_version_message)
-        parser.add_argument(dest="outpath", help="path to output directory [default: \'out/\']", nargs='?' , default="out/")
+        parser.add_argument(dest="outdir", help="path to output directory [default: %(default)s]", nargs='?' , default= os.path.join(os.path.dirname(os.path.dirname(__file__)),"out"))
         
         # Process arguments
         args = parser.parse_args()
-        
-        inpath = args.inpath
-        outpath = args.outpath
-        
+  
         if args.verbose:
             log.basicConfig(format="%(levelname)s: %(message)s", level=log.DEBUG, stream=sys.stdout)
         else:
             log.basicConfig(format="%(levelname)s: %(message)s")
+                  
+        if args.inpath is not None:
+            inpath = os.path.normpath(args.inpath)
+        
+        if args.outdir is not None:
+            outdir = os.path.abspath(os.path.normpath(args.outdir))
     
         log.info("Input path: %s" % inpath)
-        log.info("Out directory: %s" % outpath)
+        log.info("Out directory: %s" % outdir)
             
         if args.vhdl:
             ipxactConfigVHDL = outputConfig()
@@ -777,14 +780,14 @@ USAGE
             ipxactConfigC = outputConfig()
             ipxactConfigC.output = outputType.c
             
-
-            
         try:
             root = openXMLFileReturnRoot(inpath)
             
             if args.vhdl:
                 printStr = vhdlFilePrint(root, ipxactConfigVHDL)
-                fileStr = outpath + getComponentName(root).lower() + "_regs.vhd"
+                if not os.path.exists(outdir):
+                    os.makedirs(outdir)
+                fileStr = os.path.join(outdir,getComponentName(root).lower() + "_regs.vhd")
                 with open(fileStr, "w") as f:
                     f.write(printStr)
                     log.info("Wrote vhdl package to %s" % fileStr)
@@ -792,7 +795,9 @@ USAGE
         
             if args.c:
                 printStr = cFilePrint(root, ipxactConfigC)
-                fileStr = outpath + getComponentName(root).lower() + "_regs.h"
+                if not os.path.exists(outdir):
+                    os.makedirs(outdir)
+                fileStr = os.path.join(outdir,getComponentName(root).lower() + "_regs.h")
                 with open(fileStr, "w") as f:
                     f.write(printStr)
                     log.info("Wrote c header to %s" % fileStr)
