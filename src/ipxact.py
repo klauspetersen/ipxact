@@ -430,7 +430,7 @@ def getFieldStringsAsList(fieldElement, ipxactConfig):
         if bitWidth is not None:
             fieldList.append(["BITWIDTH", ": integer", bitWidth])
         if volatile is not None:
-            fieldList.append(["VOLATILE", ": boolean", convBool(volatile)])
+            fieldList.append(["VOLATILE", ": spiritBoolType", convBool(volatile)])
         if access is not None:
             fieldList.append(["ACCESS", ": spiritAccessType", convAccessTypeToDefine(access)])
         if modifiedWriteValue is not None:
@@ -438,7 +438,7 @@ def getFieldStringsAsList(fieldElement, ipxactConfig):
         if readAction is not None:
             fieldList.append(["READACTION", ": spiritReadActionType", convReadActionTypeToDefine(readAction)])    
         if testable is not None:
-            fieldList.append(["TESTABLE", ": boolean",  convBool(testable)])    
+            fieldList.append(["TESTABLE", ": spiritBoolType",  convBool(testable)])    
         if testConstraint is not None:
             fieldList.append(["TESTCONSTRAINT", ": spiritTestconstraintType",  convTestConstraintTypeToDefine(testConstraint)])    
             
@@ -496,7 +496,7 @@ def getRegisterStringsAsList(registerElement, ipxactConfig):
         if size is not None:
             regList.append(["SIZE", ": integer", size])
         if volatile is not None:
-            regList.append(["VOLATILE", ": boolean", convBool(volatile)])
+            regList.append(["VOLATILE", ": spiritBoolType", convBool(volatile)])
         if access is not None:
             regList.append(["ACCESS", ": spiritAccessType", convAccessTypeToDefine(access)])
         if resetValue is not None:
@@ -561,13 +561,13 @@ def getAddressBlockStringsAsList(addressBlockElement, ipxactConfig):
         if access is not None:
             abList.append(["ACCESS", ": spiritAccessType", convAccessTypeToDefine(access)])
         if volatile is not None:
-            abList.append(["VOLATILE", ": boolean", convBool(volatile)])
+            abList.append(["VOLATILE", ": spiritBoolType", convBool(volatile)])
         if modifiedWriteValue is not None:
             abList.append(["MODIFIEDWRITEVALUE", ": spiritModifiedWriteValueType", convModifedWriteValueTypeToDefine(modifiedWriteValue) ])
         if readAction is not None:
             abList.append(["READACTION", ": spiritReadActionType", convReadActionTypeToDefine(readAction) ])
         if testable is not None:
-            abList.append(["TESTABLE", ": boolean", convBool(testable) ])       
+            abList.append(["TESTABLE", ": spiritBoolType", convBool(testable) ])       
         
     return abList;
   
