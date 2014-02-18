@@ -163,6 +163,30 @@ end package;
 
 C_LRM = "IP-XACT Standard/D4, December 19, 2007"
 
+
+C_POSTFIX = {
+    'NAME'                : 'NAME',
+    'USAGE'               : 'USAGE',
+    'DESCRIPTION'         : 'DESC',
+    'BITOFFSET'           : 'BO',
+    'BITWIDTH'            : 'BW',
+    'VOLATILE'            : 'VLT',
+    'ACCESS'              : 'ACC',
+    'MODIFIEDWRITEVALUE'  : 'MWV',
+    'TESTCONSTRAINT'      : 'TC',
+    'DIM'                 : 'DIM',
+    'ADDRESSBLOCKOFFSET'  : 'ABO',
+    'BASEADDRESSOFFSET'   : 'BAO',
+    'SIZE'                : 'SIZE',
+    'RESETVALUE'          : 'RSTVAL',
+    'RESETMASK'           : 'RSTMSK',
+    'BASEADDRESS'         : 'BA',
+    'RANGE'               : 'RNG',
+    'WIDTH'               : 'WIDTH',
+    'READACTION'          : 'RDACT',
+    'TESTABLE'            : 'TST'
+           }
+
 class CLIError(Exception):
     '''Generic exception to raise and log different fatal errors.'''
     def __init__(self, msg):
@@ -383,9 +407,16 @@ def intToVhdlNumStr(num, width = 32, formatIn = formatEnum.hex):
     else:
         raise Exception("Integer format not supported")
     return outStr
-    
 
-def getFieldStringsAsList(fieldElement, ipxactConfig):
+
+
+def getPostfix(string, abbreviate):  
+    if abbreviate:
+        return C_POSTFIX[string]
+    else:
+        return string;
+
+def getFieldStringsAsList(fieldElement, conf):
     name = ifNotNoneReturnText(fieldElement.find(IPXACT_NS + 'name'))
     description = ifNotNoneReturnText(fieldElement.find(IPXACT_NS + 'description'))
     bitOffset = ifNotNoneReturnText(fieldElement.find(IPXACT_NS + 'bitOffset'))
@@ -399,48 +430,48 @@ def getFieldStringsAsList(fieldElement, ipxactConfig):
 
     fieldList = list()
     
-    if ipxactConfig.output == outputType.c:
+    if conf.args.c:
         if name is not None:
-            fieldList.append(["NAME", "\"" + name + "\""])
+            fieldList.append([getPostfix("NAME", conf.args.shortPostfix), "\"" + name + "\""])
         if description is not None:
-            fieldList.append(["DESCRIPTION", "\"" + description + "\""])
+            fieldList.append([getPostfix("DESCRIPTION", conf.args.shortPostfix), "\"" + description + "\""])
         if bitOffset is not None:
-            fieldList.append(["BITOFFSET", bitOffset])
+            fieldList.append([getPostfix("BITOFFSET", conf.args.shortPostfix), bitOffset])
         if bitWidth is not None:
-            fieldList.append(["BITWIDTH", bitWidth])
+            fieldList.append([getPostfix("BITWIDTH", conf.args.shortPostfix), bitWidth])
         if volatile is not None:
-            fieldList.append(["VOLATILE", convBool(volatile)])
+            fieldList.append([getPostfix("VOLATILE", conf.args.shortPostfix), convBool(volatile)])
         if access is not None:
-            fieldList.append(["ACCESS", convAccessTypeToDefine(access)])
+            fieldList.append([getPostfix("ACCESS", conf.args.shortPostfix), convAccessTypeToDefine(access)])
         if modifiedWriteValue is not None:
-            fieldList.append(["MODIFIEDWRITEVALUE", convModifedWriteValueTypeToDefine(modifiedWriteValue) ])
+            fieldList.append([getPostfix("MODIFIEDWRITEVALUE", conf.args.shortPostfix), convModifedWriteValueTypeToDefine(modifiedWriteValue) ])
         if readAction is not None:
-            fieldList.append(["READACTION", convReadActionTypeToDefine(readAction)])    
+            fieldList.append([getPostfix("READACTION", conf.args.shortPostfix), convReadActionTypeToDefine(readAction)])    
         if testable is not None:
-            fieldList.append(["TESTABLE", convBool(testable)])    
+            fieldList.append([getPostfix("TESTABLE", conf.args.shortPostfix), convBool(testable)])    
         if testConstraint is not None:
-            fieldList.append(["TESTCONSTRAINT", convTestConstraintTypeToDefine(testConstraint)])    
-    elif ipxactConfig.output == outputType.vhdl: 
+            fieldList.append([getPostfix("TESTCONSTRAINT", conf.args.shortPostfix), convTestConstraintTypeToDefine(testConstraint)])    
+    elif conf.args.vhdl: 
         if name is not None:
-            fieldList.append(["NAME", ": string", "\"" + name + "\""])
+            fieldList.append([getPostfix("NAME", conf.args.shortPostfix), ": string", "\"" + name + "\""])
         if description is not None:
-            fieldList.append(["DESCRIPTION", ": string", "\"" + description + "\""])
+            fieldList.append([getPostfix("DESCRIPTION", conf.args.shortPostfix), ": string", "\"" + description + "\""])
         if bitOffset is not None:
-            fieldList.append(["BITOFFSET", ": integer", bitOffset])
+            fieldList.append([getPostfix("BITOFFSET", conf.args.shortPostfix), ": integer", bitOffset])
         if bitWidth is not None:
-            fieldList.append(["BITWIDTH", ": integer", bitWidth])
+            fieldList.append([getPostfix("BITWIDTH", conf.args.shortPostfix), ": integer", bitWidth])
         if volatile is not None:
-            fieldList.append(["VOLATILE", ": spiritBoolType", convBool(volatile)])
+            fieldList.append([getPostfix("VOLATILE", conf.args.shortPostfix), ": spiritBoolType", convBool(volatile)])
         if access is not None:
-            fieldList.append(["ACCESS", ": spiritAccessType", convAccessTypeToDefine(access)])
+            fieldList.append([getPostfix("ACCESS", conf.args.shortPostfix), ": spiritAccessType", convAccessTypeToDefine(access)])
         if modifiedWriteValue is not None:
-            fieldList.append(["MODIFIEDWRITEVALUE", ": spiritModifiedWriteValueType",  convModifedWriteValueTypeToDefine(modifiedWriteValue) ])
+            fieldList.append([getPostfix("MODIFIEDWRITEVALUE", conf.args.shortPostfix), ": spiritModifiedWriteValueType",  convModifedWriteValueTypeToDefine(modifiedWriteValue) ])
         if readAction is not None:
-            fieldList.append(["READACTION", ": spiritReadActionType", convReadActionTypeToDefine(readAction)])    
+            fieldList.append([getPostfix("READACTION", conf.args.shortPostfix), ": spiritReadActionType", convReadActionTypeToDefine(readAction)])    
         if testable is not None:
-            fieldList.append(["TESTABLE", ": spiritBoolType",  convBool(testable)])    
+            fieldList.append([getPostfix("TESTABLE", conf.args.shortPostfix), ": spiritBoolType",  convBool(testable)])    
         if testConstraint is not None:
-            fieldList.append(["TESTCONSTRAINT", ": spiritTestconstraintType",  convTestConstraintTypeToDefine(testConstraint)])    
+            fieldList.append([getPostfix("TESTCONSTRAINT", conf.args.shortPostfix), ": spiritTestconstraintType",  convTestConstraintTypeToDefine(testConstraint)])    
             
     return fieldList
 
@@ -448,7 +479,7 @@ def getFieldStringsAsList(fieldElement, ipxactConfig):
 
 
 
-def getRegisterStringsAsList(registerElement, ipxactConfig):
+def getRegisterStringsAsList(registerElement, conf):
     name = ifNotNoneReturnText(registerElement.find(IPXACT_NS + 'name'))
     description = ifNotNoneReturnText(registerElement.find(IPXACT_NS + 'description'))
     dim = ifNotNoneReturnText(registerElement.find(IPXACT_NS + 'dim'))
@@ -461,52 +492,52 @@ def getRegisterStringsAsList(registerElement, ipxactConfig):
     resetMask = ifNotNoneReturnText(registerElement.find(IPXACT_NS + 'reset/' + IPXACT_NS + 'mask'))
                             
     regList = list()
-    if ipxactConfig.output == outputType.c:
+    if conf.args.c:
         if name is not None:
-            regList.append(["NAME", "\"" + name + "\""])
+            regList.append([getPostfix("NAME", conf.args.shortPostfix), "\"" + name + "\""])
         if description is not None:
-            regList.append(["DESCRIPTION", "\"" + description + "\""])
+            regList.append([getPostfix("DESCRIPTION", conf.args.shortPostfix), "\"" + description + "\""])
         if dim is not None:
-            regList.append(["DIM", dim])
+            regList.append([getPostfix("DIM", conf.args.shortPostfix), dim])
         if addressOffset is not None:
-            regList.append(["ADDRESSBLOCKOFFSET", addressOffset])
+            regList.append([getPostfix("ADDRESSBLOCKOFFSET", conf.args.shortPostfix), addressOffset])
         if addressOffset and baseAddress is not None:
-            regList.append(["BASEADDRESSOFFSET", hex(getScaledNonNegativeInteger(addressOffset) + getScaledNonNegativeInteger(baseAddress))])
+            regList.append([getPostfix("BASEADDRESSOFFSET", conf.args.shortPostfix), hex(getScaledNonNegativeInteger(addressOffset) + getScaledNonNegativeInteger(baseAddress))])
         if size is not None:
-            regList.append(["SIZE", size])
+            regList.append([getPostfix("SIZE", conf.args.shortPostfix), size])
         if volatile is not None:
-            regList.append(["VOLATILE", convBool(volatile)])
+            regList.append([getPostfix("VOLATILE", conf.args.shortPostfix), convBool(volatile)])
         if access is not None:
-            regList.append(["ACCESS", convAccessTypeToDefine(access)])
+            regList.append([getPostfix("ACCESS", conf.args.shortPostfix), convAccessTypeToDefine(access)])
         if resetValue is not None:
-            regList.append(["RESETVALUE", resetValue])    
+            regList.append([getPostfix("RESETVALUE", conf.args.shortPostfix), resetValue])    
         if resetMask is not None:
-            regList.append(["RESETMASK", resetMask])  
-    elif ipxactConfig.output == outputType.vhdl: 
+            regList.append([getPostfix("RESETMASK", conf.args.shortPostfix), resetMask])  
+    elif conf.args.vhdl: 
         if name is not None:
-            regList.append(["NAME", ": string", "\"" + name + "\""])
+            regList.append([getPostfix("NAME", conf.args.shortPostfix), ": string", "\"" + name + "\""])
         if description is not None:
-            regList.append(["DESCRIPTION", ": string", "\"" + description + "\""])
+            regList.append([getPostfix("DESCRIPTION", conf.args.shortPostfix), ": string", "\"" + description + "\""])
         if dim is not None:
-            regList.append(["DIM", ": integer", dim])
+            regList.append([getPostfix("DIM", conf.args.shortPostfix), ": integer", dim])
         if addressOffset is not None:
-            regList.append(["ADDRESSBLOCKOFFSET", ": std_logic_vector(" + str(ipxactConfig.regAddressOffsetWidth-1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(addressOffset), ipxactConfig.regAddressOffsetWidth, ipxactConfig.regAddressOffsetFormat)])
+            regList.append([getPostfix("ADDRESSBLOCKOFFSET", conf.args.shortPostfix), ": std_logic_vector(" + str(conf.args.regAddressOffsetWidth-1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(addressOffset), conf.args.regAddressOffsetWidth, conf.args.regAddressOffsetFormat)])
         if addressOffset and baseAddress is not None:
-            regList.append(["BASEADDRESSOFFSET", ": std_logic_vector(" + str(ipxactConfig.regBaseAddressOffsetWidth-1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(addressOffset) + getScaledNonNegativeInteger(baseAddress), ipxactConfig.regBaseAddressOffsetWidth, ipxactConfig.regBaseAddressOffsetFormat)])
+            regList.append([getPostfix("BASEADDRESSOFFSET", conf.args.shortPostfix), ": std_logic_vector(" + str(conf.args.regBaseAddressOffsetWidth-1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(addressOffset) + getScaledNonNegativeInteger(baseAddress), conf.args.regBaseAddressOffsetWidth, conf.args.regBaseAddressOffsetFormat)])
         if size is not None:
-            regList.append(["SIZE", ": integer", size])
+            regList.append([getPostfix("SIZE",  conf.args.shortPostfix), ": integer", size])
         if volatile is not None:
-            regList.append(["VOLATILE", ": spiritBoolType", convBool(volatile)])
+            regList.append([getPostfix("VOLATILE", conf.args.shortPostfix), ": spiritBoolType", convBool(volatile)])
         if access is not None:
-            regList.append(["ACCESS", ": spiritAccessType", convAccessTypeToDefine(access)])
+            regList.append([getPostfix("ACCESS", conf.args.shortPostfix), ": spiritAccessType", convAccessTypeToDefine(access)])
         if resetValue is not None:
-            regList.append(["RESETVALUE", ": std_logic_vector(" + str(ipxactConfig.regResetValueWidth-1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(resetValue), ipxactConfig.regResetValueWidth, ipxactConfig.regResetValueFormat)]) 
+            regList.append([getPostfix("RESETVALUE", conf.args.shortPostfix), ": std_logic_vector(" + str(conf.args.regResetValueWidth-1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(resetValue), conf.args.regResetValueWidth, conf.args.regResetValueFormat)]) 
         if resetMask is not None:
-            regList.append(["RESETMASK", ": std_logic_vector(" + str(ipxactConfig.regResetMaskWidth-1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(resetMask), ipxactConfig.regResetMaskWidth, ipxactConfig.regResetMaskFormat)])
+            regList.append([getPostfix("RESETMASK", conf.args.shortPostfix), ": std_logic_vector(" + str(conf.args.regResetMaskWidth-1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(resetMask), conf.args.regResetMaskWidth, conf.args.regResetMaskFormat)])
     return regList
 
 
-def getAddressBlockStringsAsList(addressBlockElement, ipxactConfig):
+def getAddressBlockStringsAsList(addressBlockElement, conf):
     name = ifNotNoneReturnText(addressBlockElement.find(IPXACT_NS + 'name'))
     usage = ifNotNoneReturnText(addressBlockElement.find(IPXACT_NS + 'usage'))
     baseAddress = ifNotNoneReturnText(addressBlockElement.find(IPXACT_NS + 'baseAddress'))
@@ -519,184 +550,184 @@ def getAddressBlockStringsAsList(addressBlockElement, ipxactConfig):
     readAction = ifNotNoneReturnText(addressBlockElement.find(IPXACT_NS + 'readAction'))
     testable = ifNotNoneReturnText(addressBlockElement.find(IPXACT_NS + 'testable'))
     
+    
   
     abList = list()
-    if ipxactConfig.output == outputType.c:
+    if conf.args.c:
         if name is not None:
-            abList.append(["NAME", "\"" + name + "\""])
+            abList.append([getPostfix("NAME", conf.args.shortPostfix), "\"" + name + "\""])
         if usage is not None:
-            abList.append(["USAGE", "\"" + usage + "\""])
+            abList.append([getPostfix("USAGE", conf.args.shortPostfix), "\"" + usage + "\""])
         if baseAddress is not None:
-            abList.append(["BASEADDRESS", baseAddress])
+            abList.append([getPostfix("BASEADDRESS", conf.args.shortPostfix), baseAddress])
         if range is not None:
-            abList.append(["RANGE", _range])
+            abList.append([getPostfix("RANGE", conf.args.shortPostfix), _range])
         if width is not None:
-            abList.append(["WIDTH", width])
+            abList.append([getPostfix("WIDTH", conf.args.shortPostfix), width])
         if description is not None:
-            abList.append(["DESCRIPTION", "\"" + description + "\""])
+            abList.append([getPostfix("DESCRIPTION", conf.args.shortPostfix), "\"" + description + "\""])
         if access is not None:
-            abList.append(["ACCESS", convAccessTypeToDefine(access)])
+            abList.append([getPostfix("ACCESS", conf.args.shortPostfix), convAccessTypeToDefine(access)])
         if volatile is not None:
-            abList.append(["VOLATILE", convBool(volatile)])
+            abList.append([getPostfix("VOLATILE", conf.args.shortPostfix), convBool(volatile)])
         if modifiedWriteValue is not None:
-            abList.append(["MODIFIEDWRITEVALUE", convModifedWriteValueTypeToDefine(modifiedWriteValue) ])
+            abList.append([getPostfix("MODIFIEDWRITEVALUE", conf.args.shortPostfix), convModifedWriteValueTypeToDefine(modifiedWriteValue) ])
         if readAction is not None:
-            abList.append(["READACTION", convReadActionTypeToDefine(readAction) ])
+            abList.append([getPostfix("READACTION", conf.args.shortPostfix), convReadActionTypeToDefine(readAction) ])
         if testable is not None:
-            abList.append(["TESTABLE", convBool(testable) ])
+            abList.append([getPostfix("TESTABLE", conf.args.shortPostfix), convBool(testable) ])
             
-    elif ipxactConfig.output == outputType.vhdl: 
+    elif conf.args.vhdl: 
         if name is not None:
-            abList.append(["NAME", ": string", "\"" + name + "\""])
+            abList.append([getPostfix("NAME", conf.args.shortPostfix), ": string", "\"" + name + "\""])
         if usage is not None:
-            abList.append(["USAGE", ": string", "\"" + usage + "\""])
+            abList.append([getPostfix("USAGE", conf.args.shortPostfix), ": string", "\"" + usage + "\""])
         if baseAddress is not None:
-            abList.append(["BASEADDRESS", ": std_logic_vector(" + str(ipxactConfig.abBaseAddressWidth-1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(baseAddress), ipxactConfig.abBaseAddressWidth, ipxactConfig.abBaseAddressFormat)])
+            abList.append([getPostfix("BASEADDRESS", conf.args.shortPostfix), ": std_logic_vector(" + str(conf.args.abBaseAddressWidth-1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(baseAddress), conf.args.abBaseAddressWidth, conf.args.abBaseAddressFormat)])
         if range is not None:
-            abList.append(["RANGE", ": integer", _range])
+            abList.append([getPostfix("RANGE", conf.args.shortPostfix), ": integer", _range])
         if width is not None:
-            abList.append(["WIDTH", ": integer", width])
+            abList.append([getPostfix("WIDTH", conf.args.shortPostfix), ": integer", width])
         if description is not None:
-            abList.append(["DESCRIPTION", ": string", "\"" + description + "\""])
+            abList.append([getPostfix("DESCRIPTION", conf.args.shortPostfix), ": string", "\"" + description + "\""])
         if access is not None:
-            abList.append(["ACCESS", ": spiritAccessType", convAccessTypeToDefine(access)])
+            abList.append([getPostfix("ACCESS", conf.args.shortPostfix), ": spiritAccessType", convAccessTypeToDefine(access)])
         if volatile is not None:
-            abList.append(["VOLATILE", ": spiritBoolType", convBool(volatile)])
+            abList.append([getPostfix("VOLATILE", conf.args.shortPostfix), ": spiritBoolType", convBool(volatile)])
         if modifiedWriteValue is not None:
-            abList.append(["MODIFIEDWRITEVALUE", ": spiritModifiedWriteValueType", convModifedWriteValueTypeToDefine(modifiedWriteValue) ])
+            abList.append([getPostfix("MODIFIEDWRITEVALUE", conf.args.shortPostfix), ": spiritModifiedWriteValueType", convModifedWriteValueTypeToDefine(modifiedWriteValue) ])
         if readAction is not None:
-            abList.append(["READACTION", ": spiritReadActionType", convReadActionTypeToDefine(readAction) ])
+            abList.append([getPostfix("READACTION", conf.args.shortPostfix), ": spiritReadActionType", convReadActionTypeToDefine(readAction) ])
         if testable is not None:
-            abList.append(["TESTABLE", ": spiritBoolType", convBool(testable) ])       
+            abList.append([getPostfix("TESTABLE", conf.args.shortPostfix), ": spiritBoolType", convBool(testable) ])       
         
     return abList;
   
   
 
-def abPrint(root, ipxactConfig):
+def abPrint(root, conf):
     addressBlockElementList = getAddressBlockElementList(root)
     
     printStr = ""
 
     for addressBlockElement in addressBlockElementList:
-        abStringsList = getAddressBlockStringsAsList(addressBlockElement, ipxactConfig)
+        abStringsList = getAddressBlockStringsAsList(addressBlockElement, conf)
         abColumnMaxLengths = getMaxLengtOfColumnsAsList(abStringsList)
         compName = ifNotNoneReturnText(root.find('./' + IPXACT_NS + 'name'))
         abName = ifNotNoneReturnText(addressBlockElement.find(IPXACT_NS + 'name'))
         
-        if ipxactConfig.output == outputType.vhdl:
-            #constant INTR_BLOCK_BASEADDR : std_logic_vector(63 downto 0) := X"0000000000000000";
+        if conf.args.vhdl:
             printStr += "\n\n-- Addressblock " + abName + " --"
-            formatStr = "constant {0}_{1}_{{{2}}} {{{3}}} := {{{4}}};".format(compName.upper(), abName.upper(), "0:<" + str(abColumnMaxLengths[0]), "1:<" + str(abColumnMaxLengths[1]), "2:<")
-        elif ipxactConfig.output == outputType.c:
+            formatStr = "constant "
+            if not conf.args.noComponentNameInAb:
+                formatStr += compName.upper() + "_"
+            formatStr += "{0}_{{{1}}} {{{2}}} := {{{3}}};".format(abName.upper(), "0:<" + str(abColumnMaxLengths[0]), "1:<" + str(abColumnMaxLengths[1]), "2:<")
+        elif conf.args.c:
             printStr += "\n\n/* Addressblock " + abName + " */"
             formatStr = "#define {0}_{1}_{{{2}}}\t{{{3}}}".format(compName.upper(), abName.upper(), "0:<" + str(abColumnMaxLengths[0]), "1:<" + str(abColumnMaxLengths[1]))
         
         
         for abStrings in abStringsList:
-            if ipxactConfig.output == outputType.vhdl:
+            if conf.args.vhdl:
                 printStr += "\n" + formatStr.format(abStrings[0], abStrings[1], abStrings[2])
-            elif ipxactConfig.output == outputType.c:
+            elif conf.args.c:
                 printStr += "\n" + formatStr.format(abStrings[0], abStrings[1])
             
     return printStr
 
-def regPrint(root, ipxactConfig):
+def regPrint(root, conf):
     registerElementList = getRegisterElementList(root)
     
     printStr = ""
     
     for registerElement in registerElementList:
-        regStringsList = getRegisterStringsAsList(registerElement, ipxactConfig)
+        regStringsList = getRegisterStringsAsList(registerElement, conf)
         regColumnMaxLengths = getMaxLengtOfColumnsAsList(regStringsList)
         compName = ifNotNoneReturnText(root.find('./' + IPXACT_NS + 'name'))
         abName = ifNotNoneReturnText(registerElement.find("../%sname" % IPXACT_NS))
         regName = ifNotNoneReturnText(registerElement.find(IPXACT_NS + 'name'))
-        if ipxactConfig.output == outputType.vhdl:
+        if conf.args.vhdl:
             printStr +=  "\n\n-- Register " + regName + " --"
-            formatStr = "constant {0}_{1}_{2}_{{{3}}} {{{4}}} := {{{5}}};".format(compName.upper(), abName.upper(), regName.upper(), "0:<" + str(regColumnMaxLengths[0]), "1:<" + str(regColumnMaxLengths[1]), "2:<")
-        elif ipxactConfig.output == outputType.c:
+            formatStr = "constant "
+            if not conf.args.noComponentNameInReg:
+                formatStr += compName.upper() + "_"
+            if not conf.args.noAddressBlockNameInReg:
+                formatStr += abName.upper() + "_"   
+            formatStr += "{0}_{{{1}}} {{{2}}} := {{{3}}};".format(regName.upper(), "0:<" + str(regColumnMaxLengths[0]), "1:<" + str(regColumnMaxLengths[1]), "2:<")
+        elif conf.args.c:
             printStr +=  "\n\n/* Register " + regName + " */"
             formatStr = "#define {0}_{1}_{2}_{{{3}}}\t{{{4}}}".format(compName.upper(), abName.upper(), regName.upper(), "0:<" + str(regColumnMaxLengths[0]), "1:<" + str(regColumnMaxLengths[1]))
                   
         for regStrings in regStringsList:
-            if ipxactConfig.output == outputType.vhdl:
+            if conf.args.vhdl:
                 printStr += "\n" + formatStr.format(regStrings[0], regStrings[1], regStrings[2])
-            elif ipxactConfig.output == outputType.c:
+            elif conf.args.c:
                 printStr += "\n" + formatStr.format(regStrings[0], regStrings[1])
             
     return printStr
 
-def fieldsPrint(root, ipxactConfig):
+def fieldsPrint(root, conf):
     fieldElementList = getFieldElementList(root)
     
     printStr = ""
     
     for fieldElement in fieldElementList:
-        fieldStringsList = getFieldStringsAsList(fieldElement, ipxactConfig)
+        fieldStringsList = getFieldStringsAsList(fieldElement, conf)
         fieldColumnMaxLengths = getMaxLengtOfColumnsAsList(fieldStringsList)
         compName = ifNotNoneReturnText(root.find('./' + IPXACT_NS + 'name'))
         abName = ifNotNoneReturnText(fieldElement.find("../../%sname" % IPXACT_NS))
         regName = ifNotNoneReturnText(fieldElement.find("../%sname" % IPXACT_NS))
         fieldName = ifNotNoneReturnText(fieldElement.find(IPXACT_NS + 'name'))
-        if ipxactConfig.output == outputType.vhdl:
+        if conf.args.vhdl:
             printStr +=  "\n\n-- Field " + fieldName + " --"
-            formatStr = "constant {0}_{1}_{2}_{3}_{{{4}}} {{{5}}} := {{{6}}};".format(compName.upper(), abName.upper(), regName.upper(), fieldName.upper(), "0:<" + str(fieldColumnMaxLengths[0]), "1:<" + str(fieldColumnMaxLengths[1]), "2:<")
-        elif ipxactConfig.output == outputType.c:
+            formatStr = "constant "
+            if not conf.args.noComponentNameInField:
+                formatStr += compName.upper() + "_"
+            if not conf.args.noAddressBlockNameInField:
+                formatStr += abName.upper() + "_"
+            if not conf.args.noRegisterNameInField:
+                formatStr += regName.upper() + "_" 
+            formatStr += "{0}_{{{1}}} {{{2}}} := {{{3}}};".format(fieldName.upper(), "0:<" + str(fieldColumnMaxLengths[0]), "1:<" + str(fieldColumnMaxLengths[1]), "2:<")
+        elif conf.args.c:
             printStr +=  "\n\n/* Field " + fieldName + " */"
             formatStr = "#define {0}_{1}_{2}_{3}_{{{4}}}\t{{{5}}}".format(compName.upper(), abName.upper(), regName.upper(), fieldName.upper(), "0:<" + str(fieldColumnMaxLengths[0]), "1:<" + str(fieldColumnMaxLengths[1]))
     
         for fieldStrings in fieldStringsList:
-            if ipxactConfig.output == outputType.vhdl:
+            if conf.args.vhdl:
                 printStr += "\n" + formatStr.format(fieldStrings[0], fieldStrings[1], fieldStrings[2])
-            elif ipxactConfig.output == outputType.c:
+            elif conf.args.c:
                 printStr += "\n" + formatStr.format(fieldStrings[0], fieldStrings[1])
             
     return printStr
                     
             
-class outputType:
-    vhdl = 0
-    c = 1
-    cpp = 2
+class Config():
+    def __init__(self, args):
+        self.args = args
     
-
-class outputConfig():
-    output = outputType.vhdl
-    abBaseAddressWidth = 64
-    abBaseAddressFormat = formatEnum.hex
-    regAddressOffsetWidth = 32
-    regAddressOffsetFormat = formatEnum.hex
-    regResetMaskWidth = 32
-    regResetMaskFormat = formatEnum.hex
-    regResetValueWidth = 32
-    regResetValueFormat = formatEnum.hex
-    regBaseAddressOffsetWidth = 32
-    regBaseAddressOffsetFormat = formatEnum.hex
     
 
 
-
-def vhdlFilePrint(root, ipxactConfig):
+def vhdlFilePrint(root, conf):
     printStr = ''
     printStr += VHDL_HEADER
     printStr += VHDL_SPIRIT_TYPES
-    printStr += abPrint(root, ipxactConfig)
-    printStr += regPrint(root,  ipxactConfig)
-    printStr += fieldsPrint(root,  ipxactConfig)
+    printStr += abPrint(root, conf)
+    printStr += regPrint(root,  conf)
+    printStr += fieldsPrint(root,  conf)
     printStr += VHDL_FOOTER
         
     return printStr
     
             
             
-def cFilePrint(root, ipxactConfig):
+def cFilePrint(root, conf):
     printStr = ''
     printStr += C_PRAGMA_ONCE
     printStr += C_SPIRIT_TYPES
-    printStr += abPrint(root, ipxactConfig)
-    printStr += regPrint(root, ipxactConfig)
-    printStr += fieldsPrint(root, ipxactConfig)
+    printStr += abPrint(root, conf)
+    printStr += regPrint(root, conf)
+    printStr += fieldsPrint(root, conf)
     
     return printStr
 
@@ -732,6 +763,13 @@ USAGE
         parser.add_argument("-v", "--verbose", dest="verbose", action="count", help="set verbosity level [default: %(default)s]")
         parser.add_argument('-c', action='store_true', help="enable c header output")
         parser.add_argument('-vhdl', action='store_true', help="enable vhdl package output")
+        parser.add_argument('-shortPostfix', action='store_true', help="Abbreviate postfix, i.e _DESCRIPTION -> _DESC")
+        parser.add_argument('-noComponentNameInAb', action='store_true', help="Exclude component name from generated address block names. Warning: This could cause naming conflicts.")
+        parser.add_argument('-noComponentNameInReg', action='store_true', help="Exclude component name from generated register names. Warning: This could cause naming conflicts.")
+        parser.add_argument('-noAddressBlockNameInReg', action='store_true', help="Exclude address block name from generated register names. Warning: This could cause naming conflicts.")
+        parser.add_argument('-noComponentNameInField', action='store_true', help="Exclude component name from generated field names. Warning: This could cause naming conflicts.")
+        parser.add_argument('-noAddressBlockNameInField', action='store_true', help="Exclude address block name from generated field names. Warning: This could cause naming conflicts.")
+        parser.add_argument('-noRegisterNameInField', action='store_true', help="Exclude register name from generated field names. Warning: This could cause naming conflicts.")
         parser.add_argument('-abBaseAddressWidth', help="width of std_logic_vector in generated addressblock address output [default: %(default)s]", metavar='width', default=64, type=int)
         parser.add_argument('-abBaseAddressFormat', help="format of std_logic_vector in generated addressblock address output [default: %(default)s]", metavar='format', default="hex")
         parser.add_argument('-regAddressOffsetWidth', help="width of std_logic_vector in generated register address offset output [default: %(default)s]", metavar='width', default=32, type=int)
@@ -762,29 +800,14 @@ USAGE
         log.info("Input path: %s" % inpath)
         log.info("Out directory: %s" % outdir)
             
-        if args.vhdl:
-            ipxactConfigVHDL = outputConfig()
-            ipxactConfigVHDL.output = outputType.vhdl
-            ipxactConfigVHDL.abBaseAddressWidth = args.abBaseAddressWidth
-            ipxactConfigVHDL.abBaseAddressFormat = args.abBaseAddressFormat
-            ipxactConfigVHDL.regAddressOffsetWidth = args.regAddressOffsetWidth
-            ipxactConfigVHDL.regAddressOffsetFormat = args.regAddressOffsetFormat
-            ipxactConfigVHDL.regResetMaskWidth = args.regResetMaskWidth
-            ipxactConfigVHDL.regResetMaskFormat = args.regResetMaskFormat
-            ipxactConfigVHDL.regResetValueWidth = args.regResetValueWidth
-            ipxactConfigVHDL.regResetValueFormat = args.regResetValueFormat
-            ipxactConfigVHDL.regBaseAddressOffsetWidth = args.regBaseAddressOffsetWidth
-            ipxactConfigVHDL.regBaseAddressOffsetFormat = args.regBaseAddressOffsetFormat
-            
-        if args.c:
-            ipxactConfigC = outputConfig()
-            ipxactConfigC.output = outputType.c
+        
+        conf = Config(args)
             
         try:
             root = openXMLFileReturnRoot(inpath)
             
             if args.vhdl:
-                printStr = vhdlFilePrint(root, ipxactConfigVHDL)
+                printStr = vhdlFilePrint(root, conf)
                 if not os.path.exists(outdir):
                     os.makedirs(outdir)
                 fileStr = os.path.join(outdir,getComponentName(root).lower() + "_regs.vhd")
@@ -794,7 +817,7 @@ USAGE
         
         
             if args.c:
-                printStr = cFilePrint(root, ipxactConfigC)
+                printStr = cFilePrint(root, conf)
                 if not os.path.exists(outdir):
                     os.makedirs(outdir)
                 fileStr = os.path.join(outdir,getComponentName(root).lower() + "_regs.h")
