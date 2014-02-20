@@ -100,7 +100,7 @@ class intToBinStringError(Exception):
     def __init__(self, message):
         Exception.__init__(self, "'%s'" % (message))
         
-VHDL_HEADER ='''
+VHDL_HEADER = '''
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.math_real.all;
@@ -181,10 +181,13 @@ C_POSTFIX = {
     'RESETVALUE'          : 'RSTVAL',
     'RESETMASK'           : 'RSTMSK',
     'BASEADDRESS'         : 'BA',
+    'HIGHADDRESS'         : 'HA',
     'RANGE'               : 'RNG',
     'WIDTH'               : 'WIDTH',
     'READACTION'          : 'RDACT',
-    'TESTABLE'            : 'TST'
+    'TESTABLE'            : 'TST',
+    'NUMBER'              : 'NUM',
+    'NUMBEROFREGS'        : 'NUMREGS'
            }
 
 class CLIError(Exception):
@@ -351,12 +354,16 @@ def getScaledInteger(inStr):
         else:
             dec = int(numStr)
     except ValueError:
-        raise Exception("Non std IPXACT integer \"%s\", see section C.9 of %s" %(inStr, C_LRM))
+        raise Exception("Non std IPXACT integer \"%s\", see section C.9 of %s" % (inStr, C_LRM))
     
     return dec * mult * neg
 
 def getScaledNonNegativeInteger(inStr):
+    if inStr == None:
+        return inStr
+    
     num = getScaledInteger(inStr)
+    
     if num < 0:
         raise Exception("Non negative number expected, received: %s" % (inStr))
 
@@ -371,13 +378,13 @@ def getScaledPositiveInteger(inStr):
 
 def getScalarFromString(scaledString):
     if scaledString[-1].upper() == 'K':
-        multiplier = 2**10
+        multiplier = 2 ** 10
     elif scaledString[-1].upper() == 'M':
-        multiplier = 2**20
+        multiplier = 2 ** 20
     elif scaledString[-1].upper() == 'G':
-        multiplier = 2**30
+        multiplier = 2 ** 30
     elif scaledString[-1].upper() == 'T':
-        multiplier = 2**40 
+        multiplier = 2 ** 40 
     else:
         multiplier = 1 
     return multiplier
@@ -390,14 +397,14 @@ class formatEnum:
 def intToHexString(value, bits):
     if bits % 4 != 0:
         raise intToHexStringError("intToHexString: Cannot convert width %d to hex, only widths divisible of 4 allowed." % bits)
-    return "{0:0{1}X}".format(value & ((1<<bits) - 1), bits//4)
+    return "{0:0{1}X}".format(value & ((1 << bits) - 1), bits // 4)
 
 def intToBinString(value, bits):
     if math.ceil(math.log(value, 2)) > bits:
-        raise intToBinStringError("intToBinString: bit width %d too small to represent value %d." %(bits, value))
-    return "{0:0{1}b}".format(value & ((1<<bits) - 1), bits//4)
+        raise intToBinStringError("intToBinString: bit width %d too small to represent value %d." % (bits, value))
+    return "{0:0{1}b}".format(value & ((1 << bits) - 1), bits // 4)
 
-def intToVhdlNumStr(num, width = 32, formatIn = formatEnum.hex):
+def intToVhdlNumStr(num, width=32, formatIn=formatEnum.hex):
     if formatIn == formatEnum.hex:
         outStr = "X\"" + intToHexString(num, width) + "\""
     elif formatIn == formatEnum.dec:
@@ -409,6 +416,36 @@ def intToVhdlNumStr(num, width = 32, formatIn = formatEnum.hex):
     return outStr
 
 
+def elementSort(elementList, xmlkey):
+    # swap_test = False
+    # getScaledNonNegativeInteger(addressBlockElementList[0].find(IPXACT_NS + 'baseAddress').text)
+    for i in range(0, len(elementList) - 1):
+        # as suggested by kubrick, makes sense
+        swap_test = False
+        for j in range(0, len(elementList) - i - 1):
+            if getScaledNonNegativeInteger(ifNotNoneReturnText(elementList[j].find(xmlkey))) > getScaledNonNegativeInteger(ifNotNoneReturnText(elementList[j + 1].find(xmlkey))):
+                elementList[j], elementList[j + 1] = elementList[j + 1], elementList[j]  # swap
+            swap_test = True
+        if swap_test == False:
+            break
+
+def getRegisterNum(thisRegisterElement):
+    num = 0
+    registerElementList = list()
+    root = thisRegisterElement.find("../../../..")
+    addressBlockElementList = getAddressBlockElementList(root)
+    elementSort(addressBlockElementList, IPXACT_NS + 'baseAddress')
+    for addressBlockElement in addressBlockElementList:
+        registerElementList = addressBlockElement.findall(IPXACT_NS + "register")
+        if addressBlockElement != thisRegisterElement.find("../."):
+            num = num + len(registerElementList)
+        else:
+            elementSort(registerElementList, IPXACT_NS + 'addressOffset')
+            for registerElement in registerElementList:
+                if registerElement != thisRegisterElement:
+                    num = num + 1
+                else:
+                    return num
 
 def getPostfix(string, abbreviate):  
     if abbreviate:
@@ -465,13 +502,13 @@ def getFieldStringsAsList(fieldElement, conf):
         if access is not None:
             fieldList.append([getPostfix("ACCESS", conf.args.shortPostfix), ": spiritAccessType", convAccessTypeToDefine(access)])
         if modifiedWriteValue is not None:
-            fieldList.append([getPostfix("MODIFIEDWRITEVALUE", conf.args.shortPostfix), ": spiritModifiedWriteValueType",  convModifedWriteValueTypeToDefine(modifiedWriteValue) ])
+            fieldList.append([getPostfix("MODIFIEDWRITEVALUE", conf.args.shortPostfix), ": spiritModifiedWriteValueType", convModifedWriteValueTypeToDefine(modifiedWriteValue) ])
         if readAction is not None:
             fieldList.append([getPostfix("READACTION", conf.args.shortPostfix), ": spiritReadActionType", convReadActionTypeToDefine(readAction)])    
         if testable is not None:
-            fieldList.append([getPostfix("TESTABLE", conf.args.shortPostfix), ": spiritBoolType",  convBool(testable)])    
+            fieldList.append([getPostfix("TESTABLE", conf.args.shortPostfix), ": spiritBoolType", convBool(testable)])    
         if testConstraint is not None:
-            fieldList.append([getPostfix("TESTCONSTRAINT", conf.args.shortPostfix), ": spiritTestconstraintType",  convTestConstraintTypeToDefine(testConstraint)])    
+            fieldList.append([getPostfix("TESTCONSTRAINT", conf.args.shortPostfix), ": spiritTestconstraintType", convTestConstraintTypeToDefine(testConstraint)])    
             
     return fieldList
 
@@ -490,6 +527,7 @@ def getRegisterStringsAsList(registerElement, conf):
     access = ifNotNoneReturnText(registerElement.find(IPXACT_NS + 'access'))
     resetValue = ifNotNoneReturnText(registerElement.find(IPXACT_NS + 'reset/' + IPXACT_NS + 'value'))
     resetMask = ifNotNoneReturnText(registerElement.find(IPXACT_NS + 'reset/' + IPXACT_NS + 'mask'))
+    number = getRegisterNum(registerElement)
                             
     regList = list()
     if conf.args.c:
@@ -521,19 +559,21 @@ def getRegisterStringsAsList(registerElement, conf):
         if dim is not None:
             regList.append([getPostfix("DIM", conf.args.shortPostfix), ": integer", dim])
         if addressOffset is not None:
-            regList.append([getPostfix("ADDRESSBLOCKOFFSET", conf.args.shortPostfix), ": std_logic_vector(" + str(conf.args.regAddressOffsetWidth-1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(addressOffset), conf.args.regAddressOffsetWidth, conf.args.regAddressOffsetFormat)])
+            regList.append([getPostfix("ADDRESSBLOCKOFFSET", conf.args.shortPostfix), ": std_logic_vector(" + str(conf.args.regAddressOffsetWidth - 1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(addressOffset), conf.args.regAddressOffsetWidth, conf.args.regAddressOffsetFormat)])
         if addressOffset and baseAddress is not None:
-            regList.append([getPostfix("BASEADDRESSOFFSET", conf.args.shortPostfix), ": std_logic_vector(" + str(conf.args.regBaseAddressOffsetWidth-1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(addressOffset) + getScaledNonNegativeInteger(baseAddress), conf.args.regBaseAddressOffsetWidth, conf.args.regBaseAddressOffsetFormat)])
+            regList.append([getPostfix("BASEADDRESSOFFSET", conf.args.shortPostfix), ": std_logic_vector(" + str(conf.args.regBaseAddressOffsetWidth - 1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(addressOffset) + getScaledNonNegativeInteger(baseAddress), conf.args.regBaseAddressOffsetWidth, conf.args.regBaseAddressOffsetFormat)])
         if size is not None:
-            regList.append([getPostfix("SIZE",  conf.args.shortPostfix), ": integer", size])
+            regList.append([getPostfix("SIZE", conf.args.shortPostfix), ": integer", size])
         if volatile is not None:
             regList.append([getPostfix("VOLATILE", conf.args.shortPostfix), ": spiritBoolType", convBool(volatile)])
         if access is not None:
             regList.append([getPostfix("ACCESS", conf.args.shortPostfix), ": spiritAccessType", convAccessTypeToDefine(access)])
         if resetValue is not None:
-            regList.append([getPostfix("RESETVALUE", conf.args.shortPostfix), ": std_logic_vector(" + str(conf.args.regResetValueWidth-1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(resetValue), conf.args.regResetValueWidth, conf.args.regResetValueFormat)]) 
+            regList.append([getPostfix("RESETVALUE", conf.args.shortPostfix), ": std_logic_vector(" + str(conf.args.regResetValueWidth - 1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(resetValue), conf.args.regResetValueWidth, conf.args.regResetValueFormat)]) 
         if resetMask is not None:
-            regList.append([getPostfix("RESETMASK", conf.args.shortPostfix), ": std_logic_vector(" + str(conf.args.regResetMaskWidth-1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(resetMask), conf.args.regResetMaskWidth, conf.args.regResetMaskFormat)])
+            regList.append([getPostfix("RESETMASK", conf.args.shortPostfix), ": std_logic_vector(" + str(conf.args.regResetMaskWidth - 1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(resetMask), conf.args.regResetMaskWidth, conf.args.regResetMaskFormat)])
+        if number is not None:
+            regList.append([getPostfix("NUMBER", conf.args.shortPostfix), ": integer", str(number)])
     return regList
 
 
@@ -541,6 +581,8 @@ def getAddressBlockStringsAsList(addressBlockElement, conf):
     name = ifNotNoneReturnText(addressBlockElement.find(IPXACT_NS + 'name'))
     usage = ifNotNoneReturnText(addressBlockElement.find(IPXACT_NS + 'usage'))
     baseAddress = ifNotNoneReturnText(addressBlockElement.find(IPXACT_NS + 'baseAddress'))
+    highAddress = hex(getScaledNonNegativeInteger(ifNotNoneReturnText(addressBlockElement.find(IPXACT_NS + 'baseAddress'))) + 
+                      getScaledNonNegativeInteger(ifNotNoneReturnText(addressBlockElement.find(IPXACT_NS + 'range'))) - 1)
     _range = ifNotNoneReturnText(addressBlockElement.find(IPXACT_NS + 'range'))
     width = ifNotNoneReturnText(addressBlockElement.find(IPXACT_NS + 'width'))
     description = ifNotNoneReturnText(addressBlockElement.find(IPXACT_NS + 'description'))
@@ -549,6 +591,7 @@ def getAddressBlockStringsAsList(addressBlockElement, conf):
     modifiedWriteValue = ifNotNoneReturnText(addressBlockElement.find(IPXACT_NS + 'modifiedWriteValue'))
     readAction = ifNotNoneReturnText(addressBlockElement.find(IPXACT_NS + 'readAction'))
     testable = ifNotNoneReturnText(addressBlockElement.find(IPXACT_NS + 'testable'))
+    numberOfRegs = len(addressBlockElement.findall(IPXACT_NS + "register"))
     
     
   
@@ -560,6 +603,8 @@ def getAddressBlockStringsAsList(addressBlockElement, conf):
             abList.append([getPostfix("USAGE", conf.args.shortPostfix), "\"" + usage + "\""])
         if baseAddress is not None:
             abList.append([getPostfix("BASEADDRESS", conf.args.shortPostfix), baseAddress])
+        if highAddress is not None:
+            abList.append([getPostfix("HIGHADDRESS", conf.args.shortPostfix), highAddress])
         if range is not None:
             abList.append([getPostfix("RANGE", conf.args.shortPostfix), _range])
         if width is not None:
@@ -583,7 +628,9 @@ def getAddressBlockStringsAsList(addressBlockElement, conf):
         if usage is not None:
             abList.append([getPostfix("USAGE", conf.args.shortPostfix), ": string", "\"" + usage + "\""])
         if baseAddress is not None:
-            abList.append([getPostfix("BASEADDRESS", conf.args.shortPostfix), ": std_logic_vector(" + str(conf.args.abBaseAddressWidth-1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(baseAddress), conf.args.abBaseAddressWidth, conf.args.abBaseAddressFormat)])
+            abList.append([getPostfix("BASEADDRESS", conf.args.shortPostfix), ": std_logic_vector(" + str(conf.args.abBaseAddressWidth - 1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(baseAddress), conf.args.abBaseAddressWidth, conf.args.abBaseAddressFormat)])
+        if highAddress is not None:
+            abList.append([getPostfix("HIGHADDRESS", conf.args.shortPostfix), ": std_logic_vector(" + str(conf.args.abHighAddressWidth - 1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(highAddress), conf.args.abHighAddressWidth, conf.args.abHighAddressFormat)])
         if range is not None:
             abList.append([getPostfix("RANGE", conf.args.shortPostfix), ": integer", _range])
         if width is not None:
@@ -599,7 +646,9 @@ def getAddressBlockStringsAsList(addressBlockElement, conf):
         if readAction is not None:
             abList.append([getPostfix("READACTION", conf.args.shortPostfix), ": spiritReadActionType", convReadActionTypeToDefine(readAction) ])
         if testable is not None:
-            abList.append([getPostfix("TESTABLE", conf.args.shortPostfix), ": spiritBoolType", convBool(testable) ])       
+            abList.append([getPostfix("TESTABLE", conf.args.shortPostfix), ": spiritBoolType", convBool(testable) ]) 
+        if numberOfRegs is not None:
+            abList.append([getPostfix("NUMBEROFREGS", conf.args.shortPostfix), ": integer", str(numberOfRegs)])
         
     return abList;
   
@@ -647,7 +696,7 @@ def regPrint(root, conf):
         abName = ifNotNoneReturnText(registerElement.find("../%sname" % IPXACT_NS))
         regName = ifNotNoneReturnText(registerElement.find(IPXACT_NS + 'name'))
         if conf.args.vhdl:
-            printStr +=  "\n\n-- Register " + regName + " --"
+            printStr += "\n\n-- Register " + regName + " --"
             formatStr = "constant "
             if not conf.args.noComponentNameInReg:
                 formatStr += compName.upper() + "_"
@@ -655,7 +704,7 @@ def regPrint(root, conf):
                 formatStr += abName.upper() + "_"   
             formatStr += "{0}_{{{1}}} {{{2}}} := {{{3}}};".format(regName.upper(), "0:<" + str(regColumnMaxLengths[0]), "1:<" + str(regColumnMaxLengths[1]), "2:<")
         elif conf.args.c:
-            printStr +=  "\n\n/* Register " + regName + " */"
+            printStr += "\n\n/* Register " + regName + " */"
             formatStr = "#define {0}_{1}_{2}_{{{3}}}\t{{{4}}}".format(compName.upper(), abName.upper(), regName.upper(), "0:<" + str(regColumnMaxLengths[0]), "1:<" + str(regColumnMaxLengths[1]))
                   
         for regStrings in regStringsList:
@@ -679,7 +728,7 @@ def fieldsPrint(root, conf):
         regName = ifNotNoneReturnText(fieldElement.find("../%sname" % IPXACT_NS))
         fieldName = ifNotNoneReturnText(fieldElement.find(IPXACT_NS + 'name'))
         if conf.args.vhdl:
-            printStr +=  "\n\n-- Field " + fieldName + " --"
+            printStr += "\n\n-- Field " + fieldName + " --"
             formatStr = "constant "
             if not conf.args.noComponentNameInField:
                 formatStr += compName.upper() + "_"
@@ -689,7 +738,7 @@ def fieldsPrint(root, conf):
                 formatStr += regName.upper() + "_" 
             formatStr += "{0}_{{{1}}} {{{2}}} := {{{3}}};".format(fieldName.upper(), "0:<" + str(fieldColumnMaxLengths[0]), "1:<" + str(fieldColumnMaxLengths[1]), "2:<")
         elif conf.args.c:
-            printStr +=  "\n\n/* Field " + fieldName + " */"
+            printStr += "\n\n/* Field " + fieldName + " */"
             formatStr = "#define {0}_{1}_{2}_{3}_{{{4}}}\t{{{5}}}".format(compName.upper(), abName.upper(), regName.upper(), fieldName.upper(), "0:<" + str(fieldColumnMaxLengths[0]), "1:<" + str(fieldColumnMaxLengths[1]))
     
         for fieldStrings in fieldStringsList:
@@ -713,8 +762,8 @@ def vhdlFilePrint(root, conf):
     printStr += VHDL_HEADER
     printStr += VHDL_SPIRIT_TYPES
     printStr += abPrint(root, conf)
-    printStr += regPrint(root,  conf)
-    printStr += fieldsPrint(root,  conf)
+    printStr += regPrint(root, conf)
+    printStr += fieldsPrint(root, conf)
     printStr += VHDL_FOOTER
         
     return printStr
@@ -772,6 +821,8 @@ USAGE
         parser.add_argument('-noRegisterNameInField', action='store_true', help="Exclude register name from generated field names. Warning: This could cause naming conflicts.")
         parser.add_argument('-abBaseAddressWidth', help="width of std_logic_vector in generated addressblock address output [default: %(default)s]", metavar='width', default=64, type=int)
         parser.add_argument('-abBaseAddressFormat', help="format of std_logic_vector in generated addressblock address output [default: %(default)s]", metavar='format', default="hex")
+        parser.add_argument('-abHighAddressWidth', help="width of std_logic_vector in generated addressblock address output [default: %(default)s]", metavar='width', default=64, type=int)
+        parser.add_argument('-abHighAddressFormat', help="format of std_logic_vector in generated addressblock address output [default: %(default)s]", metavar='format', default="hex")
         parser.add_argument('-regAddressOffsetWidth', help="width of std_logic_vector in generated register address offset output [default: %(default)s]", metavar='width', default=32, type=int)
         parser.add_argument('-regAddressOffsetFormat', help="format of std_logic_vector in generated register address offset output [default: %(default)s]", metavar='format', default="hex")
         parser.add_argument('-regResetMaskWidth', help="width of std_logic_vector in generated register reset mask output [default: %(default)s]", metavar='width', default=64, type=int)
@@ -781,7 +832,7 @@ USAGE
         parser.add_argument('-regBaseAddressOffsetWidth', help="width of std_logic_vector in generated register address offset output [default: %(default)s]", metavar='width', default=32, type=int)
         parser.add_argument('-regBaseAddressOffsetFormat', help="format of std_logic_vector in generated register address offset mask output [default: %(default)s]", metavar='format', default="hex")
         parser.add_argument('-V', '--version', action='version', version=program_version_message)
-        parser.add_argument(dest="outdir", help="path to output directory [default: %(default)s]", nargs='?' , default= os.path.join(os.path.dirname(os.path.dirname(__file__)),"out"))
+        parser.add_argument(dest="outdir", help="path to output directory [default: %(default)s]", nargs='?' , default=os.path.join(os.path.dirname(os.path.dirname(__file__)), "out"))
         
         # Process arguments
         args = parser.parse_args()
@@ -810,7 +861,7 @@ USAGE
                 printStr = vhdlFilePrint(root, conf)
                 if not os.path.exists(outdir):
                     os.makedirs(outdir)
-                fileStr = os.path.join(outdir,getComponentName(root).lower() + "_regs.vhd")
+                fileStr = os.path.join(outdir, getComponentName(root).lower() + "_regs.vhd")
                 with open(fileStr, "w") as f:
                     f.write(printStr)
                     log.info("Wrote vhdl package to %s" % fileStr)
@@ -820,7 +871,7 @@ USAGE
                 printStr = cFilePrint(root, conf)
                 if not os.path.exists(outdir):
                     os.makedirs(outdir)
-                fileStr = os.path.join(outdir,getComponentName(root).lower() + "_regs.h")
+                fileStr = os.path.join(outdir, getComponentName(root).lower() + "_regs.h")
                 with open(fileStr, "w") as f:
                     f.write(printStr)
                     log.info("Wrote c header to %s" % fileStr)
@@ -846,9 +897,9 @@ USAGE
 
 if __name__ == "__main__":
     if DEBUG:
-        #sys.argv.append("-h")
+        # sys.argv.append("-h")
         sys.argv.append("-v")
-        #sys.argv.append("-V")
+        # sys.argv.append("-V")
         pass
     if TESTRUN:
         import doctest
