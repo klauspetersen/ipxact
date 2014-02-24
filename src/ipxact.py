@@ -169,6 +169,8 @@ C_POSTFIX = {
     'USAGE'               : 'USAGE',
     'DESCRIPTION'         : 'DESC',
     'BITOFFSET'           : 'BO',
+    'BITOFFSETLOW'        : 'BOL',
+    'BITOFFSETHIGH'       : 'BOH',
     'BITWIDTH'            : 'BW',
     'VOLATILE'            : 'VLT',
     'ACCESS'              : 'ACC',
@@ -457,7 +459,9 @@ def getFieldStringsAsList(fieldElement, conf):
     name = ifNotNoneReturnText(fieldElement.find(IPXACT_NS + 'name'))
     description = ifNotNoneReturnText(fieldElement.find(IPXACT_NS + 'description'))
     bitOffset = ifNotNoneReturnText(fieldElement.find(IPXACT_NS + 'bitOffset'))
+    bitOffsetLow = bitOffset
     bitWidth = ifNotNoneReturnText(fieldElement.find(IPXACT_NS + 'bitWidth'))
+    bitOffsetHigh = str(getScaledInteger(bitOffsetLow) + getScaledInteger(bitWidth) - 1)
     volatile = ifNotNoneReturnText(fieldElement.find(IPXACT_NS + 'volatile'))
     access = ifNotNoneReturnText(fieldElement.find(IPXACT_NS + 'access'))
     modifiedWriteValue = ifNotNoneReturnText(fieldElement.find(IPXACT_NS + 'modifiedWriteValue'))
@@ -495,6 +499,10 @@ def getFieldStringsAsList(fieldElement, conf):
             fieldList.append([getPostfix("DESCRIPTION", conf.args.shortPostfix), ": string", "\"" + description + "\""])
         if bitOffset is not None:
             fieldList.append([getPostfix("BITOFFSET", conf.args.shortPostfix), ": integer", bitOffset])
+        if bitOffsetLow is not None:
+            fieldList.append([getPostfix("BITOFFSETLOW", conf.args.shortPostfix), ": integer", bitOffsetLow])
+        if bitOffsetHigh is not None:
+            fieldList.append([getPostfix("BITOFFSETHIGH", conf.args.shortPostfix), ": integer", bitOffsetHigh])
         if bitWidth is not None:
             fieldList.append([getPostfix("BITWIDTH", conf.args.shortPostfix), ": integer", bitWidth])
         if volatile is not None:
