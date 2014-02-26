@@ -163,6 +163,33 @@ end package;
 
 C_LRM = "IP-XACT Standard/D4, December 19, 2007"
 
+C_DESC = {
+    'NAME'                : 'Name',
+    'USAGE'               : 'Usage',
+    'DESCRIPTION'         : 'Description',
+    'BITOFFSET'           : 'Bit offset',
+    'BITOFFSETLOW'        : 'Bit offset low',
+    'BITOFFSETHIGH'       : 'Bit offset high',
+    'BITWIDTH'            : 'Bit width',
+    'VOLATILE'            : 'Volatile',
+    'ACCESS'              : 'Access',
+    'MODIFIEDWRITEVALUE'  : 'Modified write value',
+    'TESTCONSTRAINT'      : 'Test constraint',
+    'DIM'                 : 'Dimensions',
+    'ADDRESSBLOCKOFFSET'  : 'Address block offset',
+    'BASEADDRESSOFFSET'   : 'Base address offset',
+    'SIZE'                : 'Size',
+    'RESETVALUE'          : 'Reset value',
+    'RESETMASK'           : 'Reset mask',
+    'BASEADDRESS'         : 'Base address',
+    'HIGHADDRESS'         : 'High address',
+    'RANGE'               : 'Range',
+    'WIDTH'               : 'Width',
+    'READACTION'          : 'Read action',
+    'TESTABLE'            : 'Is testable',
+    'NUMBER'              : 'Register number',
+    'NUMBEROFREGS'        : 'Number of registers'
+          }
 
 C_POSTFIX = {
     'NAME'                : 'NAME',
@@ -455,6 +482,14 @@ def getPostfix(string, abbreviate):
     else:
         return string;
 
+
+def getDesc(string, lang):
+    if lang.upper() == "C":
+        return """/*""" + C_DESC[string] + """*/"""
+    elif lang.upper() == "VHDL":
+        return "--" + C_DESC[string]
+        
+
 def getFieldStringsAsList(fieldElement, conf):
     name = ifNotNoneReturnText(fieldElement.find(IPXACT_NS + 'name'))
     description = ifNotNoneReturnText(fieldElement.find(IPXACT_NS + 'description'))
@@ -473,25 +508,25 @@ def getFieldStringsAsList(fieldElement, conf):
     
     if conf.args.c:
         if name is not None:
-            fieldList.append([getPostfix("NAME", conf.args.shortPostfix), "\"" + name + "\""])
+            fieldList.append([getPostfix("NAME", conf.args.shortPostfix), "\"" + name + "\"", getDesc("NAME", "C")])
         if description is not None:
-            fieldList.append([getPostfix("DESCRIPTION", conf.args.shortPostfix), "\"" + description + "\""])
+            fieldList.append([getPostfix("DESCRIPTION", conf.args.shortPostfix), "\"" + description + "\"", getDesc("DESCRIPTION", "C")])
         if bitOffset is not None:
-            fieldList.append([getPostfix("BITOFFSET", conf.args.shortPostfix), bitOffset])
+            fieldList.append([getPostfix("BITOFFSET", conf.args.shortPostfix), bitOffset, getDesc("BITOFFSET", "C")])
         if bitWidth is not None:
-            fieldList.append([getPostfix("BITWIDTH", conf.args.shortPostfix), bitWidth])
+            fieldList.append([getPostfix("BITWIDTH", conf.args.shortPostfix), bitWidth, getDesc("BITWIDTH", "C")])
         if volatile is not None:
-            fieldList.append([getPostfix("VOLATILE", conf.args.shortPostfix), convBool(volatile)])
+            fieldList.append([getPostfix("VOLATILE", conf.args.shortPostfix), convBool(volatile), getDesc("VOLATILE", "C")])
         if access is not None:
-            fieldList.append([getPostfix("ACCESS", conf.args.shortPostfix), convAccessTypeToDefine(access)])
+            fieldList.append([getPostfix("ACCESS", conf.args.shortPostfix), convAccessTypeToDefine(access), getDesc("ACCESS", "C")])
         if modifiedWriteValue is not None:
-            fieldList.append([getPostfix("MODIFIEDWRITEVALUE", conf.args.shortPostfix), convModifedWriteValueTypeToDefine(modifiedWriteValue) ])
+            fieldList.append([getPostfix("MODIFIEDWRITEVALUE", conf.args.shortPostfix), convModifedWriteValueTypeToDefine(modifiedWriteValue), getDesc("MODIFIEDWRITEVALUE", "C")])
         if readAction is not None:
-            fieldList.append([getPostfix("READACTION", conf.args.shortPostfix), convReadActionTypeToDefine(readAction)])    
+            fieldList.append([getPostfix("READACTION", conf.args.shortPostfix), convReadActionTypeToDefine(readAction), getDesc("READACTION", "C")])    
         if testable is not None:
-            fieldList.append([getPostfix("TESTABLE", conf.args.shortPostfix), convBool(testable)])    
+            fieldList.append([getPostfix("TESTABLE", conf.args.shortPostfix), convBool(testable), getDesc("TESTABLE", "C")])    
         if testConstraint is not None:
-            fieldList.append([getPostfix("TESTCONSTRAINT", conf.args.shortPostfix), convTestConstraintTypeToDefine(testConstraint)])    
+            fieldList.append([getPostfix("TESTCONSTRAINT", conf.args.shortPostfix), convTestConstraintTypeToDefine(testConstraint), getDesc("TESTCONSTRAINT", "C")])    
     elif conf.args.vhdl: 
         if name is not None:
             fieldList.append([getPostfix("NAME", conf.args.shortPostfix), ": string", "\"" + name + "\""])
@@ -540,25 +575,25 @@ def getRegisterStringsAsList(registerElement, conf):
     regList = list()
     if conf.args.c:
         if name is not None:
-            regList.append([getPostfix("NAME", conf.args.shortPostfix), "\"" + name + "\""])
+            regList.append([getPostfix("NAME", conf.args.shortPostfix), "\"" + name + "\"", getDesc("NAME", "C")])
         if description is not None:
-            regList.append([getPostfix("DESCRIPTION", conf.args.shortPostfix), "\"" + description + "\""])
+            regList.append([getPostfix("DESCRIPTION", conf.args.shortPostfix), "\"" + description + "\"", getDesc("DESCRIPTION", "C")])
         if dim is not None:
-            regList.append([getPostfix("DIM", conf.args.shortPostfix), dim])
+            regList.append([getPostfix("DIM", conf.args.shortPostfix), dim, getDesc("DIM", "C")])
         if addressOffset is not None:
-            regList.append([getPostfix("ADDRESSBLOCKOFFSET", conf.args.shortPostfix), addressOffset])
+            regList.append([getPostfix("ADDRESSBLOCKOFFSET", conf.args.shortPostfix), addressOffset, getDesc("ADDRESSBLOCKOFFSET", "C")])
         if addressOffset and baseAddress is not None:
-            regList.append([getPostfix("BASEADDRESSOFFSET", conf.args.shortPostfix), hex(getScaledNonNegativeInteger(addressOffset) + getScaledNonNegativeInteger(baseAddress))])
+            regList.append([getPostfix("BASEADDRESSOFFSET", conf.args.shortPostfix), hex(getScaledNonNegativeInteger(addressOffset) + getScaledNonNegativeInteger(baseAddress)), getDesc("BASEADDRESSOFFSET", "C")])
         if size is not None:
-            regList.append([getPostfix("SIZE", conf.args.shortPostfix), size])
+            regList.append([getPostfix("SIZE", conf.args.shortPostfix), size, getDesc("SIZE", "C")])
         if volatile is not None:
-            regList.append([getPostfix("VOLATILE", conf.args.shortPostfix), convBool(volatile)])
+            regList.append([getPostfix("VOLATILE", conf.args.shortPostfix), convBool(volatile), getDesc("VOLATILE", "C")])
         if access is not None:
-            regList.append([getPostfix("ACCESS", conf.args.shortPostfix), convAccessTypeToDefine(access)])
+            regList.append([getPostfix("ACCESS", conf.args.shortPostfix), convAccessTypeToDefine(access), getDesc("ACCESS", "C")])
         if resetValue is not None:
-            regList.append([getPostfix("RESETVALUE", conf.args.shortPostfix), resetValue])    
+            regList.append([getPostfix("RESETVALUE", conf.args.shortPostfix), resetValue, getDesc("RESETVALUE", "C")])    
         if resetMask is not None:
-            regList.append([getPostfix("RESETMASK", conf.args.shortPostfix), resetMask])  
+            regList.append([getPostfix("RESETMASK", conf.args.shortPostfix), resetMask, getDesc("RESETMASK", "C")])  
     elif conf.args.vhdl: 
         if name is not None:
             regList.append([getPostfix("NAME", conf.args.shortPostfix), ": string", "\"" + name + "\""])
@@ -606,29 +641,29 @@ def getAddressBlockStringsAsList(addressBlockElement, conf):
     abList = list()
     if conf.args.c:
         if name is not None:
-            abList.append([getPostfix("NAME", conf.args.shortPostfix), "\"" + name + "\""])
+            abList.append([getPostfix("NAME", conf.args.shortPostfix), "\"" + name + "\"", getDesc("NAME", "C")])
         if usage is not None:
-            abList.append([getPostfix("USAGE", conf.args.shortPostfix), "\"" + usage + "\""])
+            abList.append([getPostfix("USAGE", conf.args.shortPostfix), "\"" + usage + "\"", getDesc("USAGE", "C")])
         if baseAddress is not None:
-            abList.append([getPostfix("BASEADDRESS", conf.args.shortPostfix), baseAddress])
+            abList.append([getPostfix("BASEADDRESS", conf.args.shortPostfix), baseAddress, getDesc("BASEADDRESS", "C")])
         if highAddress is not None:
-            abList.append([getPostfix("HIGHADDRESS", conf.args.shortPostfix), highAddress])
+            abList.append([getPostfix("HIGHADDRESS", conf.args.shortPostfix), highAddress, getDesc("HIGHADDRESS", "C")])
         if range is not None:
-            abList.append([getPostfix("RANGE", conf.args.shortPostfix), _range])
+            abList.append([getPostfix("RANGE", conf.args.shortPostfix), _range, getDesc("RANGE", "C")])
         if width is not None:
-            abList.append([getPostfix("WIDTH", conf.args.shortPostfix), width])
+            abList.append([getPostfix("WIDTH", conf.args.shortPostfix), width, getDesc("WIDTH", "C")])
         if description is not None:
-            abList.append([getPostfix("DESCRIPTION", conf.args.shortPostfix), "\"" + description + "\""])
+            abList.append([getPostfix("DESCRIPTION", conf.args.shortPostfix), "\"" + description + "\"", getDesc("DESCRIPTION", "C")])
         if access is not None:
-            abList.append([getPostfix("ACCESS", conf.args.shortPostfix), convAccessTypeToDefine(access)])
+            abList.append([getPostfix("ACCESS", conf.args.shortPostfix), convAccessTypeToDefine(access), getDesc("ACCESS", "C")])
         if volatile is not None:
-            abList.append([getPostfix("VOLATILE", conf.args.shortPostfix), convBool(volatile)])
+            abList.append([getPostfix("VOLATILE", conf.args.shortPostfix), convBool(volatile), getDesc("VOLATILE", "C")])
         if modifiedWriteValue is not None:
-            abList.append([getPostfix("MODIFIEDWRITEVALUE", conf.args.shortPostfix), convModifedWriteValueTypeToDefine(modifiedWriteValue) ])
+            abList.append([getPostfix("MODIFIEDWRITEVALUE", conf.args.shortPostfix), convModifedWriteValueTypeToDefine(modifiedWriteValue), getDesc("MODIFIEDWRITEVALUE", "C")])
         if readAction is not None:
-            abList.append([getPostfix("READACTION", conf.args.shortPostfix), convReadActionTypeToDefine(readAction) ])
+            abList.append([getPostfix("READACTION", conf.args.shortPostfix), convReadActionTypeToDefine(readAction), getDesc("READACTION", "C")])
         if testable is not None:
-            abList.append([getPostfix("TESTABLE", conf.args.shortPostfix), convBool(testable) ])
+            abList.append([getPostfix("TESTABLE", conf.args.shortPostfix), convBool(testable), getDesc("TESTABLE", "C")])
             
     elif conf.args.vhdl: 
         if name is not None:
@@ -681,14 +716,14 @@ def abPrint(root, conf):
             formatStr += "{0}_{{{1}}} {{{2}}} := {{{3}}};".format(abName.upper(), "0:<" + str(abColumnMaxLengths[0]), "1:<" + str(abColumnMaxLengths[1]), "2:<")
         elif conf.args.c:
             printStr += "\n\n/* Addressblock " + abName + " */"
-            formatStr = "#define {0}_{1}_{{{2}}}\t{{{3}}}".format(compName.upper(), abName.upper(), "0:<" + str(abColumnMaxLengths[0]), "1:<" + str(abColumnMaxLengths[1]))
+            formatStr = "#define {0}_{1}_{{{2}}}\t{{{3}}}\t{{{4}}}".format(compName.upper(), abName.upper(), "0:<" + str(abColumnMaxLengths[0]), "1:<" + str(abColumnMaxLengths[1]), "2:<" + str(abColumnMaxLengths[2]))
         
         
         for abStrings in abStringsList:
             if conf.args.vhdl:
                 printStr += "\n" + formatStr.format(abStrings[0], abStrings[1], abStrings[2])
             elif conf.args.c:
-                printStr += "\n" + formatStr.format(abStrings[0], abStrings[1])
+                printStr += "\n" + formatStr.format(abStrings[0], abStrings[1], abStrings[2])
             
     return printStr
 
@@ -713,13 +748,13 @@ def regPrint(root, conf):
             formatStr += "{0}_{{{1}}} {{{2}}} := {{{3}}};".format(regName.upper(), "0:<" + str(regColumnMaxLengths[0]), "1:<" + str(regColumnMaxLengths[1]), "2:<")
         elif conf.args.c:
             printStr += "\n\n/* Register " + regName + " */"
-            formatStr = "#define {0}_{1}_{2}_{{{3}}}\t{{{4}}}".format(compName.upper(), abName.upper(), regName.upper(), "0:<" + str(regColumnMaxLengths[0]), "1:<" + str(regColumnMaxLengths[1]))
+            formatStr = "#define {0}_{1}_{2}_{{{3}}}\t{{{4}}}\t{{{5}}}".format(compName.upper(), abName.upper(), regName.upper(), "0:<" + str(regColumnMaxLengths[0]), "1:<" + str(regColumnMaxLengths[1]), "2:<" + str(regColumnMaxLengths[2]))
                   
         for regStrings in regStringsList:
             if conf.args.vhdl:
                 printStr += "\n" + formatStr.format(regStrings[0], regStrings[1], regStrings[2])
             elif conf.args.c:
-                printStr += "\n" + formatStr.format(regStrings[0], regStrings[1])
+                printStr += "\n" + formatStr.format(regStrings[0], regStrings[1], regStrings[2])
             
     return printStr
 
@@ -747,13 +782,13 @@ def fieldsPrint(root, conf):
             formatStr += "{0}_{{{1}}} {{{2}}} := {{{3}}};".format(fieldName.upper(), "0:<" + str(fieldColumnMaxLengths[0]), "1:<" + str(fieldColumnMaxLengths[1]), "2:<")
         elif conf.args.c:
             printStr += "\n\n/* Field " + fieldName + " */"
-            formatStr = "#define {0}_{1}_{2}_{3}_{{{4}}}\t{{{5}}}".format(compName.upper(), abName.upper(), regName.upper(), fieldName.upper(), "0:<" + str(fieldColumnMaxLengths[0]), "1:<" + str(fieldColumnMaxLengths[1]))
+            formatStr = "#define {0}_{1}_{2}_{3}_{{{4}}}\t{{{5}}}\t{{{6}}}".format(compName.upper(), abName.upper(), regName.upper(), fieldName.upper(), "0:<" + str(fieldColumnMaxLengths[0]), "1:<" + str(fieldColumnMaxLengths[1]), "2:<" + str(fieldColumnMaxLengths[2]))
     
         for fieldStrings in fieldStringsList:
             if conf.args.vhdl:
                 printStr += "\n" + formatStr.format(fieldStrings[0], fieldStrings[1], fieldStrings[2])
             elif conf.args.c:
-                printStr += "\n" + formatStr.format(fieldStrings[0], fieldStrings[1])
+                printStr += "\n" + formatStr.format(fieldStrings[0], fieldStrings[1], fieldStrings[2])
             
     return printStr
                     
