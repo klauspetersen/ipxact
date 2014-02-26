@@ -241,6 +241,9 @@ def getRegisterElementList(root):
 def getFieldElementList(root):
     return root.findall(".//%sfield" % IPXACT_NS)
 
+def getEnumElementList(root):
+    return root.findall(".//%senumeratedValues" % IPXACT_NS)
+
         
 def getMaxLengtOfColumnsAsList(xList):
     maxLengthList = list()
@@ -488,7 +491,23 @@ def getDesc(string, lang):
         return """/*""" + C_DESC[string] + """*/"""
     elif lang.upper() == "VHDL":
         return "--" + C_DESC[string]
+  
+def getEnumStringsAsList(enumElement, conf):
+    
+    
+    enumeratedValueList = enumElement.findall(IPXACT_NS + 'enumeratedValue')
+
+    enumList = list()
         
+    for enumeratedValue in enumeratedValueList:
+        name = ifNotNoneReturnText(enumeratedValue.find(IPXACT_NS + 'name')) 
+        value = ifNotNoneReturnText(enumeratedValue.find(IPXACT_NS + 'value')) 
+        if name is not None and value is not None:
+            enumList.append([name, value])
+   
+            
+    return enumList
+      
 
 def getFieldStringsAsList(fieldElement, conf):
     name = ifNotNoneReturnText(fieldElement.find(IPXACT_NS + 'name'))
@@ -758,6 +777,40 @@ def regPrint(root, conf):
             
     return printStr
 
+def enumsPrint(root, conf):
+    enumElementList = getEnumElementList(root)
+    
+    printStr = ""
+    
+    for enumElement in enumElementList:
+        enumStringsList = getEnumStringsAsList(enumElement, conf)
+        enumColumnMaxLengths = getMaxLengtOfColumnsAsList(enumStringsList)
+        compName = ifNotNoneReturnText(root.find('./' + IPXACT_NS + 'name'))
+        abName = ifNotNoneReturnText(enumElement.find("../../%sname" % IPXACT_NS))
+        regName = ifNotNoneReturnText(enumElement.find("../%sname" % IPXACT_NS))
+        enumName = ifNotNoneReturnText(enumElement.find(IPXACT_NS + 'name'))
+        if conf.args.vhdl:
+            printStr += "\n\n-- enum " + enumName + " --"
+            formatStr = "constant "
+            if not conf.args.noComponentNameInenum:
+                formatStr += compName.upper() + "_"
+            if not conf.args.noAddressBlockNameInenum:
+                formatStr += abName.upper() + "_"
+            if not conf.args.noRegisterNameInenum:
+                formatStr += regName.upper() + "_" 
+            formatStr += "{0}_{{{1}}} {{{2}}} := {{{3}}};".format(enumName.upper(), "0:<" + str(enumColumnMaxLengths[0]), "1:<" + str(enumColumnMaxLengths[1]), "2:<")
+        elif conf.args.c:
+            printStr += "\n\n/* enum " + enumName + " */"
+            formatStr = "#define {0}_{1}_{2}_{3}_{{{4}}}\t{{{5}}}\t{{{6}}}".format(compName.upper(), abName.upper(), regName.upper(), enumName.upper(), "0:<" + str(enumColumnMaxLengths[0]), "1:<" + str(enumColumnMaxLengths[1]), "2:<" + str(enumColumnMaxLengths[2]))
+    
+        for enumStrings in enumStringsList:
+            if conf.args.vhdl:
+                printStr += "\n" + formatStr.format(enumStrings[0], enumStrings[1], enumStrings[2])
+            elif conf.args.c:
+                printStr += "\n" + formatStr.format(enumStrings[0], enumStrings[1], enumStrings[2])
+            
+    return printStr
+
 def fieldsPrint(root, conf):
     fieldElementList = getFieldElementList(root)
     
@@ -820,6 +873,7 @@ def cFilePrint(root, conf):
     printStr += abPrint(root, conf)
     printStr += regPrint(root, conf)
     printStr += fieldsPrint(root, conf)
+    #printStr += enumsPrint(root, conf)
     
     return printStr
 
