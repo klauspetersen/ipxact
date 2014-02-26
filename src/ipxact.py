@@ -840,7 +840,8 @@ USAGE
         parser.add_argument('-regBaseAddressOffsetWidth', help="width of std_logic_vector in generated register address offset output [default: %(default)s]", metavar='width', default=32, type=int)
         parser.add_argument('-regBaseAddressOffsetFormat', help="format of std_logic_vector in generated register address offset mask output [default: %(default)s]", metavar='format', default="hex")
         parser.add_argument('-V', '--version', action='version', version=program_version_message)
-        parser.add_argument(dest="outdir", help="path to output directory [default: %(default)s]", nargs='?' , default=os.path.join(os.path.dirname(os.path.dirname(__file__)), "out"))
+        parser.add_argument('-cpath', dest="outc", help="Output path for c header file [default: %(default)s]",  default=os.path.join(os.path.dirname(os.path.dirname(__file__)), "out/ipxact.h"))
+        parser.add_argument('-vhdlpath', dest="outvhdl", help="Ouput path for vhdl package file [default: %(default)s]",  default=os.path.join(os.path.dirname(os.path.dirname(__file__)), "out/ipxact.vhd"))
         
         # Process arguments
         args = parser.parse_args()
@@ -853,11 +854,13 @@ USAGE
         if args.inpath is not None:
             inpath = os.path.normpath(args.inpath)
         
-        if args.outdir is not None:
-            outdir = os.path.abspath(os.path.normpath(args.outdir))
+        if args.outvhdl is not None:
+            args.outvhdl = os.path.abspath(os.path.normpath(args.outvhdl))
+            
+        if args.outc is not None:
+            args.outc = os.path.abspath(os.path.normpath(args.outc))
     
         log.info("Input path: %s" % inpath)
-        log.info("Out directory: %s" % outdir)
             
         
         conf = Config(args)
@@ -866,23 +869,23 @@ USAGE
             root = openXMLFileReturnRoot(inpath)
             
             if args.vhdl:
+                log.info("Out directory (VHDL paclage): %s" % args.outvhdl)
                 printStr = vhdlFilePrint(root, conf)
-                if not os.path.exists(outdir):
-                    os.makedirs(outdir)
-                fileStr = os.path.join(outdir, getComponentName(root).lower() + "_regs.vhd")
-                with open(fileStr, "w") as f:
+                if not os.path.exists(os.path.dirname(args.outvhdl)):
+                    os.makedirs(os.path.dirname(args.outvhdl))
+                with open(args.outvhdl, "w") as f:
                     f.write(printStr)
-                    log.info("Wrote vhdl package to %s" % fileStr)
+                    log.info("Wrote vhdl package to %s" % args.outvhdl)
         
         
             if args.c:
+                log.info("Out directory (C header): %s" % args.outc)
                 printStr = cFilePrint(root, conf)
-                if not os.path.exists(outdir):
-                    os.makedirs(outdir)
-                fileStr = os.path.join(outdir, getComponentName(root).lower() + "_regs.h")
-                with open(fileStr, "w") as f:
+                if not os.path.exists(os.path.dirname(args.outc)):
+                    os.makedirs(os.path.dirname(args.outc))
+                with open(args.outc, "w") as f:
                     f.write(printStr)
-                    log.info("Wrote c header to %s" % fileStr)
+                    log.info("Wrote c header to %s" % args.outc)
                 
         except IOError as (errno, strerror):
             log.error("I/O error({0}): {1}".format(errno, strerror))
