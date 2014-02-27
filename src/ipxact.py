@@ -503,11 +503,13 @@ def getEnumStringsAsList(enumElement, conf):
         name = ifNotNoneReturnText(enumeratedValue.find(IPXACT_NS + 'name')) 
         value = ifNotNoneReturnText(enumeratedValue.find(IPXACT_NS + 'value')) 
         if name is not None and value is not None:
-            enumList.append([name, value])
+            enumList.append([name, ": integer", str(getScaledNonNegativeInteger(value))])
    
             
     return enumList
       
+      
+
 
 def getFieldStringsAsList(fieldElement, conf):
     name = ifNotNoneReturnText(fieldElement.find(IPXACT_NS + 'name'))
@@ -686,31 +688,31 @@ def getAddressBlockStringsAsList(addressBlockElement, conf):
             
     elif conf.args.vhdl: 
         if name is not None:
-            abList.append([getPostfix("NAME", conf.args.shortPostfix), ": string", "\"" + name + "\""])
+            abList.append([getPostfix("NAME", conf.args.shortPostfix), ": string", "\"" + name + "\"", getDesc("NAME", "VHDL")])
         if usage is not None:
-            abList.append([getPostfix("USAGE", conf.args.shortPostfix), ": string", "\"" + usage + "\""])
+            abList.append([getPostfix("USAGE", conf.args.shortPostfix), ": string", "\"" + usage + "\"", getDesc("NAME", "VHDL")])
         if baseAddress is not None:
-            abList.append([getPostfix("BASEADDRESS", conf.args.shortPostfix), ": std_logic_vector(" + str(conf.args.abBaseAddressWidth - 1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(baseAddress), conf.args.abBaseAddressWidth, conf.args.abBaseAddressFormat)])
+            abList.append([getPostfix("BASEADDRESS", conf.args.shortPostfix), ": std_logic_vector(" + str(conf.args.abBaseAddressWidth - 1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(baseAddress), conf.args.abBaseAddressWidth, conf.args.abBaseAddressFormat), getDesc("NAME", "VHDL")])
         if highAddress is not None:
-            abList.append([getPostfix("HIGHADDRESS", conf.args.shortPostfix), ": std_logic_vector(" + str(conf.args.abHighAddressWidth - 1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(highAddress), conf.args.abHighAddressWidth, conf.args.abHighAddressFormat)])
+            abList.append([getPostfix("HIGHADDRESS", conf.args.shortPostfix), ": std_logic_vector(" + str(conf.args.abHighAddressWidth - 1) + " downto 0)", intToVhdlNumStr(getScaledNonNegativeInteger(highAddress), conf.args.abHighAddressWidth, conf.args.abHighAddressFormat), getDesc("NAME", "VHDL")])
         if range is not None:
-            abList.append([getPostfix("RANGE", conf.args.shortPostfix), ": integer", _range])
+            abList.append([getPostfix("RANGE", conf.args.shortPostfix), ": integer", _range, getDesc("NAME", "VHDL")])
         if width is not None:
-            abList.append([getPostfix("WIDTH", conf.args.shortPostfix), ": integer", width])
+            abList.append([getPostfix("WIDTH", conf.args.shortPostfix), ": integer", width, getDesc("NAME", "VHDL")])
         if description is not None:
-            abList.append([getPostfix("DESCRIPTION", conf.args.shortPostfix), ": string", "\"" + description + "\""])
+            abList.append([getPostfix("DESCRIPTION", conf.args.shortPostfix), ": string", "\"" + description + "\"", getDesc("NAME", "VHDL")])
         if access is not None:
-            abList.append([getPostfix("ACCESS", conf.args.shortPostfix), ": spiritAccessType", convAccessTypeToDefine(access)])
+            abList.append([getPostfix("ACCESS", conf.args.shortPostfix), ": spiritAccessType", convAccessTypeToDefine(access), getDesc("NAME", "VHDL")])
         if volatile is not None:
-            abList.append([getPostfix("VOLATILE", conf.args.shortPostfix), ": spiritBoolType", convBool(volatile)])
+            abList.append([getPostfix("VOLATILE", conf.args.shortPostfix), ": spiritBoolType", convBool(volatile), getDesc("NAME", "VHDL")])
         if modifiedWriteValue is not None:
-            abList.append([getPostfix("MODIFIEDWRITEVALUE", conf.args.shortPostfix), ": spiritModifiedWriteValueType", convModifedWriteValueTypeToDefine(modifiedWriteValue) ])
+            abList.append([getPostfix("MODIFIEDWRITEVALUE", conf.args.shortPostfix), ": spiritModifiedWriteValueType", convModifedWriteValueTypeToDefine(modifiedWriteValue), getDesc("NAME", "VHDL")])
         if readAction is not None:
-            abList.append([getPostfix("READACTION", conf.args.shortPostfix), ": spiritReadActionType", convReadActionTypeToDefine(readAction) ])
+            abList.append([getPostfix("READACTION", conf.args.shortPostfix), ": spiritReadActionType", convReadActionTypeToDefine(readAction), getDesc("NAME", "VHDL")])
         if testable is not None:
-            abList.append([getPostfix("TESTABLE", conf.args.shortPostfix), ": spiritBoolType", convBool(testable) ]) 
+            abList.append([getPostfix("TESTABLE", conf.args.shortPostfix), ": spiritBoolType", convBool(testable), getDesc("NAME", "VHDL")]) 
         if numberOfRegs is not None:
-            abList.append([getPostfix("NUMBEROFREGS", conf.args.shortPostfix), ": integer", str(numberOfRegs)])
+            abList.append([getPostfix("NUMBEROFREGS", conf.args.shortPostfix), ": integer", str(numberOfRegs), getDesc("NAME", "VHDL")])
         
     return abList;
   
@@ -785,29 +787,36 @@ def enumsPrint(root, conf):
     for enumElement in enumElementList:
         enumStringsList = getEnumStringsAsList(enumElement, conf)
         enumColumnMaxLengths = getMaxLengtOfColumnsAsList(enumStringsList)
-        compName = ifNotNoneReturnText(root.find('./' + IPXACT_NS + 'name'))
-        abName = ifNotNoneReturnText(enumElement.find("../../%sname" % IPXACT_NS))
-        regName = ifNotNoneReturnText(enumElement.find("../%sname" % IPXACT_NS))
-        enumName = ifNotNoneReturnText(enumElement.find(IPXACT_NS + 'name'))
+#       compName = ifNotNoneReturnText(root.find('./' + IPXACT_NS + 'name'))
+        abName = ifNotNoneReturnText(enumElement.find("../../../%sname" % IPXACT_NS))
+        regName = ifNotNoneReturnText(enumElement.find("../../%sname" % IPXACT_NS))
+        fieldName = ifNotNoneReturnText(enumElement.find("../%sname" % IPXACT_NS))
+        
         if conf.args.vhdl:
-            printStr += "\n\n-- enum " + enumName + " --"
             formatStr = "constant "
-            if not conf.args.noComponentNameInenum:
-                formatStr += compName.upper() + "_"
-            if not conf.args.noAddressBlockNameInenum:
+            if not conf.args.noAddressBlockNameInField:
                 formatStr += abName.upper() + "_"
-            if not conf.args.noRegisterNameInenum:
+            if not conf.args.noRegisterNameInField:
                 formatStr += regName.upper() + "_" 
-            formatStr += "{0}_{{{1}}} {{{2}}} := {{{3}}};".format(enumName.upper(), "0:<" + str(enumColumnMaxLengths[0]), "1:<" + str(enumColumnMaxLengths[1]), "2:<")
+            formatStr += "{0}_{{{1}}} {{{2}}} := {{{3}}};".format(fieldName.upper(), "0:<" + str(enumColumnMaxLengths[0]), "1:<" + str(enumColumnMaxLengths[1]), "2:<")
         elif conf.args.c:
-            printStr += "\n\n/* enum " + enumName + " */"
-            formatStr = "#define {0}_{1}_{2}_{3}_{{{4}}}\t{{{5}}}\t{{{6}}}".format(compName.upper(), abName.upper(), regName.upper(), enumName.upper(), "0:<" + str(enumColumnMaxLengths[0]), "1:<" + str(enumColumnMaxLengths[1]), "2:<" + str(enumColumnMaxLengths[2]))
+            formatStr = "\t {0}_{1}_{2}_{3} = {4}"
+            
+            
     
-        for enumStrings in enumStringsList:
-            if conf.args.vhdl:
-                printStr += "\n" + formatStr.format(enumStrings[0], enumStrings[1], enumStrings[2])
-            elif conf.args.c:
-                printStr += "\n" + formatStr.format(enumStrings[0], enumStrings[1], enumStrings[2])
+        if conf.args.vhdl:
+            printStr += "\n\n-- enum " + fieldName + " --"
+            for enumStrings in enumStringsList:
+                printStr += "\n" + formatStr.format(enumStrings[0].upper(), enumStrings[1], enumStrings[2])
+        elif conf.args.c:
+            printStr += "\n\n/* enum " + fieldName + " */"
+            printStr += "\n typedef enum {\n"
+            for enumStrings in enumStringsList:
+                printStr += formatStr.format(abName.upper(), regName.upper(), fieldName.upper(), enumStrings[0].upper(), enumStrings[1])
+                if enumStrings != enumStringsList[-1]:
+                    printStr += ","
+                printStr += "\n"      
+            printStr += "} " + "{0}_{1}_{2}_ENUM;".format(abName.upper(), regName.upper(), fieldName.upper())
             
     return printStr
 
@@ -854,12 +863,15 @@ class Config():
 
 
 def vhdlFilePrint(root, conf):
+    vhdlConf = conf
+    vhdlConf.c = None
     printStr = ''
     printStr += VHDL_HEADER
     printStr += VHDL_SPIRIT_TYPES
-    printStr += abPrint(root, conf)
-    printStr += regPrint(root, conf)
-    printStr += fieldsPrint(root, conf)
+    printStr += abPrint(root, vhdlConf)
+    printStr += regPrint(root, vhdlConf)
+    printStr += fieldsPrint(root, vhdlConf)
+    printStr += enumsPrint(root, vhdlConf)
     printStr += VHDL_FOOTER
         
     return printStr
@@ -867,13 +879,15 @@ def vhdlFilePrint(root, conf):
             
             
 def cFilePrint(root, conf):
+    cConf = conf
+    cConf.vhdl = None
     printStr = ''
     printStr += C_PRAGMA_ONCE
     printStr += C_SPIRIT_TYPES
-    printStr += abPrint(root, conf)
-    printStr += regPrint(root, conf)
-    printStr += fieldsPrint(root, conf)
-    #printStr += enumsPrint(root, conf)
+    printStr += abPrint(root, cConf)
+    printStr += regPrint(root, cConf)
+    printStr += fieldsPrint(root, cConf)
+    printStr += enumsPrint(root, cConf)
     
     return printStr
 
