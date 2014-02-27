@@ -504,7 +504,10 @@ def getEnumStringsAsList(enumElement, conf):
         name = ifNotNoneReturnText(enumeratedValue.find(IPXACT_NS + 'name')) 
         value = ifNotNoneReturnText(enumeratedValue.find(IPXACT_NS + 'value')) 
         if name is not None and value is not None:
-            enumList.append([name, ": integer", str(getScaledNonNegativeInteger(value))])
+            if conf.args.vhdl:
+                enumList.append([name, ": integer", str(getScaledNonNegativeInteger(value))])
+            elif conf.args.c:
+                enumList.append([name, str(getScaledNonNegativeInteger(value))])
    
             
     return enumList
