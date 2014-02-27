@@ -25,6 +25,7 @@ import sys
 import os
 import logging as log
 import math
+import copy
 from lxml import etree
 
 from argparse import ArgumentParser
@@ -863,8 +864,8 @@ class Config():
 
 
 def vhdlFilePrint(root, conf):
-    vhdlConf = conf
-    vhdlConf.c = None
+    vhdlConf = copy.deepcopy(conf)
+    vhdlConf.args.c = None
     printStr = ''
     printStr += VHDL_HEADER
     printStr += VHDL_SPIRIT_TYPES
@@ -879,8 +880,8 @@ def vhdlFilePrint(root, conf):
             
             
 def cFilePrint(root, conf):
-    cConf = conf
-    cConf.vhdl = None
+    cConf = copy.deepcopy(conf)
+    cConf.args.vhdl = None
     printStr = ''
     printStr += C_PRAGMA_ONCE
     printStr += C_SPIRIT_TYPES
@@ -980,7 +981,7 @@ USAGE
                     f.write(printStr)
                     log.info("Wrote vhdl package to %s" % args.outvhdl)
         
-        
+         
             if args.c:
                 log.info("Out directory (C header): %s" % args.outc)
                 printStr = cFilePrint(root, conf)
